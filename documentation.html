@@ -11,20 +11,50 @@
         h1 { border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
         h2 { border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
         code { background-color: #f1f5f9; color: #db2777; padding: 2px 6px; border-radius: 4px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.9em; }
-        pre { background-color: #1e293b; color: #f8fafc; padding: 15px; border-radius: 6px; overflow-x: auto; font-size: 0.9em; }
-        pre code { background-color: transparent; color: inherit; padding: 0; }
-        ul, ol { margin-left: 20px; }
+        ul { margin-left: 20px; }
         li { margin-bottom: 8px; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; margin-top: 10px; }
-        table, th, td { border: 1px solid #cbd5e1; }
-        th, td { padding: 12px; text-align: left; }
-        th { background-color: #f1f5f9; color: #0f172a; font-weight: 600; }
-        .callout { background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 15px; margin: 20px 0; border-radius: 0 4px 4px 0; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Axxanoid Marketplace: Developer Documentation</h1>
+
+        <h2>1. Architectural Overview & Standards</h2>
+        <p>The Axxanoid Marketplace plugin relies on strict separation of concerns. PHP controllers handle logic and routing exclusively. All structural HTML is housed in <code>/templates/template-parts/</code>, and all styling is enqueued via external <code>.css</code> files. The system is designed to interface with native WooCommerce taxonomies (Brands and Categories) to prevent data siloing.</p>
+
+        <h2>2. Data Schema & Relationships</h2>
+        <p>The system relies on a 1-to-1-to-Many relationship across WordPress and WooCommerce.</p>
+        <ul>
+            <li><strong>The Maker (<code>axx_market_maker</code> CPT):</strong> Acts as the administrative and subscription hub. Stores the Maker's email, trial expiration date, and active WooCommerce Subscription Order ID.</li>
+            <li><strong>The Brand (WooCommerce Taxonomy):</strong> Each Maker CPT is mapped 1:1 with a native WooCommerce Brand ID.</li>
+            <li><strong>The Products (WooCommerce <code>product</code>):</strong> Scraped items are created as <code>external</code> WooCommerce products. They are assigned to the Maker's Brand ID and pushed into the "Indie Finds" parent category.</li>
+        </ul>
+
+        <h2>3. REST API Endpoints</h2>
+        <p>The system opens specific endpoints for the headless Python drones:</p>
+        <ul>
+            <li><code>/wp-json/wp/v2/axx_market_maker</code>: Accepts initial Maker payloads (Email, Shop URL) and initializes the 10-day Trial status.</li>
+            <li><code>/wp-json/wc/v3/products</code>: Native Woo API used to inject the external Etsy products and assign them to the mapped Brand ID.</li>
+            <li><code>/wp-json/axx_market/v1/pending-pitches</code>: Custom endpoint returning a clean JSON array of unpitched Makers for the Qwen 14B drone (Day 1).</li>
+            <li><code>/wp-json/axx_market/v1/pending-followups</code>: Custom endpoint returning Makers who need their Day-5 "Pennies a day" reminder.</li>
+            <li><code>/wp-json/axx_market/v1/expiring-trials</code>: Custom endpoint returning Makers who have hit Day 10 without an active subscription for Executioner processing.</li>
+        </ul>
+
+        <h2>4. The Category Mapper & Retroactive Sync</h2>
+        <p>Because Etsy categories do not cleanly align with native WooCommerce categories, the plugin utilizes a Vue.js-powered Mapping UI in the Admin Dashboard.</p>
+        <ul>
+            <li><strong>The Rule Engine:</strong> Maps scraped tags (e.g., <code>3d-printed-stash</code>) to native WooCommerce Category IDs.</li>
+            <li><strong>The "Run Now" Feature:</strong> Allows administrators to trigger a retroactive AJAX loop. This function scans all existing WooCommerce products within the "Indie Finds" parent category and applies updated category mappings based on their scraped tags.</li>
+        </ul>
+
+        <h2>5. The Dunning, "Digital Rent" & SEO Harvest Engine</h2>
+        <p>Unlike standard dropshipping, this plugin charges Makers "digital rent" via a manual, non-auto-renewing $2.99/mo invoice to eliminate B2B conversion friction.</p>
+        <ul>
+            <li>Makers are given a 10-Day Free Trial upon ingestion.</li>
+            <li>Purchasing the WooCommerce "Marketplace Rent" product updates their <code>marketplace_status</code> to <code>Active</code>.</li>
+            <li><strong>The SEO Harvest:</strong> If the trial expires unpaid on Day 10, the Executioner Drone changes the Maker CPT to <code>draft</code>. It then reassigns all of their WooCommerce products to a generic "Affiliate Finds" Brand, preserving the SEO value for Average Stoner.</li>
+            <li><strong>The Pruner:</strong> At Day 45, unpaid products in the Affiliate brand are drafted to keep the catalog fresh.</li>
+        </ul>
     </div>
 </body>
 </html>
