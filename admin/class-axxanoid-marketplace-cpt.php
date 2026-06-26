@@ -21,6 +21,8 @@ class Axxanoid_Marketplace_CPT {
 	public function __construct() {
         // Registers the 'axxanoid_marketplace_maker' custom post type
 		add_action( 'init', array( $this, 'register_marketplace_maker_cpt' ) );
+		// Register Meta Fields for the REST API
+		add_action( 'init', array( $this, 'register_marketplace_meta' ) );
     }
 
     /**
@@ -28,8 +30,7 @@ class Axxanoid_Marketplace_CPT {
 	 */
 	private function get_base_slug() {
 		$options = get_option( 'axxanoid_marketplace_settings', array() );
-		if ( ! is_array( $options ) ) { $options = array(); }
-		return ! empty( $options['maker_base_slug'] ) ? $options['maker_base_slug'] : 'maker';
+		return ! empty( $options['maker_base_slug'] ) ? $options['maker_base_slug'] : 'makers';
 	}
 
     /**
@@ -39,19 +40,17 @@ class Axxanoid_Marketplace_CPT {
 		$base_slug = $this->get_base_slug();
 
 		$labels = array(
-			'name'               => _x( 'Marketplace Maker', 'post type general name', 'axxanoid-marketplace' ),
+			'name'               => _x( 'Marketplace Makers', 'post type general name', 'axxanoid-marketplace' ),
 			'singular_name'      => _x( 'Marketplace Maker', 'post type singular name', 'axxanoid-marketplace' ),
-			'menu_name'          => _x( 'Marketplace Makers', 'admin menu', 'axxanoid-marketplace' ),
+			'menu_name'          => _x( 'Makers', 'admin menu', 'axxanoid-marketplace' ),
 			'name_admin_bar'     => _x( 'Marketplace Maker', 'add new on admin bar', 'axxanoid-marketplace' ),
 			'add_new'            => _x( 'Add New', 'marketplace maker', 'axxanoid-marketplace' ),
 			'add_new_item'       => __( 'Add New Marketplace Maker', 'axxanoid-marketplace' ),
 			'new_item'           => __( 'New Marketplace Maker', 'axxanoid-marketplace' ),
 			'edit_item'          => __( 'Edit Marketplace Maker', 'axxanoid-marketplace' ),
 			'view_item'          => __( 'View Marketplace Maker', 'axxanoid-marketplace' ),
-			'all_items'          => __( 'All Marketplace Makers', 'axxanoid-marketplace' ),
-			'search_items'       => __( 'Search Marketplace Makers', 'axxanoid-marketplace' ),
-			'not_found'          => __( 'No Marketplace Makers found.', 'axxanoid-marketplace' ),
-			'not_found_in_trash' => __( 'No Marketplace Makers found in Trash.', 'axxanoid-marketplace' ),
+			'all_items'          => __( 'All Makers', 'axxanoid-marketplace' ),
+			'search_items'       => __( 'Search Makers', 'axxanoid-marketplace' ),
 		);
 
 		$args = array(
@@ -61,13 +60,44 @@ class Axxanoid_Marketplace_CPT {
 			'show_ui'            	=> true,
 			'show_in_menu'      	=> false, // Managed under the 'Axxanoid > Directory' hub
 			'query_var'          	=> true,
+			'rewrite'            	=> array( 'slug' => $base_slug ),
 			'capability_type'    	=> 'post',
-			'has_archive'        	=> $base_slug, // This powers the main /directory/ index
+			'has_archive'        	=> true,
 			'hierarchical'       	=> false,
 			'supports'           	=> array( 'title', 'editor', 'thumbnail', 'revisions', 'custom-fields' ),
 			'show_in_rest'       	=> true, // CRITICAL: Exposes CPT to REST API
 		);
 
 		register_post_type( 'axx_market_maker', $args );
+	}
+
+	/* Registers post meta fields and exposes them to the REST API for Python.
+	 */
+	public function register_marketplace_meta() {
+		$meta_fields = array(
+			// Scraped Data
+			'maker_email'         => array( 'type' => 'string', 'default' => '' ),
+			'maker_url'           => array( 'type' => 'string', 'default' => '' ), // Etsy/IG Outbound Link	
+			// Subscription & Ego Trap Mechanics
+			'marketplace_status'    => array( 'type' => 'string', 'default' => 'Trial' ), // 'Trial', 'Active', 'Expired'
+			'trial_expiration_date' => array( 'type' => 'string', 'default' => '' ), // YYYY-MM-DD
+			'pitch_sent_date'       => array( 'type' => 'string', 'default' => '' ), // YYYY-MM-DD
+			'followup_sent_date'    => array( 'type' => 'string', 'default' => '' ), // YYYY-MM-DD
+			'renewal_sent_date'     => array( 'type' => 'string', 'default' => '' ), // YYYY-MM-DD
+			
+			// WooCommerce Links
+			'locked_in_product_id'  => array( 'type' => 'string', 'default' => '' ), // Which woo sub they buy
+			'subscription_order_id' => array( 'type' => 'string', 'default' => '' ), // Active order tracking
+		);
+
+		foreach ( $meta_fields as $meta_key => $args ) {
+			register_post_meta( 'axx_market_maker', $meta_key, array(
+				'show_in_rest'  => true,
+				'single'        => true,
+				'type'          => $args['type'],
+				'default'       => $args['default'],
+				'auth_callback' => function() { return current_user_can( 'edit_posts' ); }
+			) );
+		}
 	}
 }
