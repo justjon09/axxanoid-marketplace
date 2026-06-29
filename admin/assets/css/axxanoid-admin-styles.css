@@ -2,3 +2,28 @@
 .axx-market-tab-content {
     margin-top: 20px;
 }
+.axx-market-row {
+    margin-bottom: 15px; 
+    display: flex; 
+    align-items: center; 
+    
+    label { 
+        font-weight: bold; 
+        width: 180px; 
+        display: inline-block; 
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="url"],
+    select { 
+        width: 60%;
+        max-width: 400px;
+    }
+}
+.axx-market-highlight {
+    background: #fdf8e2;
+    padding: 15px;
+    border-left: 4px solid #f59e0b;
+    margin-bottom: 15px;
+}

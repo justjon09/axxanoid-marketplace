@@ -14,7 +14,7 @@ if ( ! defined( 'WPINC' ) ) {
 	<input type="hidden" name="page" value="axxanoid-marketplace">
 	<input type="hidden" name="tab" value="makers">
 	<?php
-	require_once AXX_MARKET_PLUGIN_DIR . 'admin/class-axxanoid-marketplace-list-table.php';
+	require_once AXX_MARKET_PLUGIN_DIR . 'admin/class-axxanoid-marketplace-makers-list-table.php';
 	$list_table = new Axxanoid_Marketplace_List_Table();
 	$list_table->prepare_items();
 	$list_table->display();

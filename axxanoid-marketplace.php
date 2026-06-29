@@ -41,8 +41,8 @@ final class Axxanoid_Marketplace_Init {
         // Admin-facing functionality
 		if ( is_admin() ) {
             // Load the meta box handler for the Maker editor.
-			// require_once AXX_MARKET_PLUGIN_DIR . 'admin/class-axxanoid-marketplace-meta-box.php';
-			// new Axxanoid_Marketplace_Meta_Box();
+			require_once AXX_MARKET_PLUGIN_DIR . 'admin/class-axxanoid-marketplace-meta-box.php';
+			new Axxanoid_Marketplace_Meta_Box();
 
 			// Register this plugin with the Axxanoid dashboard tab system.
 			add_filter( 'axxanoid_register_plugin_tab', array( __CLASS__, 'register_plugin_tab' ) );
