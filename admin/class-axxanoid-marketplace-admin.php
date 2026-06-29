@@ -18,6 +18,10 @@ class Axxanoid_Marketplace_Admin {
         add_action( 'admin_head', array( $this, 'set_admin_menu_highlight' ) );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
 		// Action hooks for form saves will go here
+
+		// AJAX Hooks for the Vue Mapper
+        add_action( 'wp_ajax_axx_market_save_mappings', array( $this, 'ajax_save_mappings' ) );
+        add_action( 'wp_ajax_axx_market_run_retroactive_sync', array( $this, 'ajax_run_retroactive_sync' ) );
 	}
 
     /**
@@ -76,7 +80,22 @@ class Axxanoid_Marketplace_Admin {
 		// Only load Vue on our specific admin page
 		if ( strpos( $hook_suffix, self::PAGE_SLUG ) === false ) return;
 
-		wp_enqueue_script( 'axx-vue-js', 'https://unpkg.com/vue@3/dist/vue.global.js', array(), '3', true );
+		wp_enqueue_script( 
+			'axx-vue-js', 
+			'https://unpkg.com/vue@3/dist/vue.global.js', 
+			array(), 
+			'3', 
+			true 
+		);
+
+		// Enqueue our custom Vue app
+        wp_enqueue_script( 
+			'axx-mapper-js', 
+			AXX_MARKET_PLUGIN_URL . 'admin/assets/js/axxanoid-mapper.js', 
+			array( 'axx-vue-js', 'jquery' ), 
+			AXX_MARKET_VERSION, 
+			true 
+		);
 
 		$category_mapping_data = $this->get_category_mapping_data_for_vue();
 
@@ -145,4 +164,43 @@ class Axxanoid_Marketplace_Admin {
 		// Load the wrapper end
 		require_once AXX_MARKET_PLUGIN_DIR . 'admin/templates/admin-footer.php';
 	}
+
+	/**
+     * AJAX: Saves the Vue.js category mappings to wp_options.
+     */
+    public function ajax_save_mappings() {
+        check_ajax_referer( self::AJAX_SEARCH_NONCE, 'nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( 'Permission denied.' );
+
+        $mappings = isset( $_POST['mappings'] ) ? json_decode( stripslashes( $_POST['mappings'] ), true ) : array();
+        $sanitized_mappings = array();
+
+        if ( is_array( $mappings ) ) {
+            foreach ( $mappings as $cat_id => $tags ) {
+                $cat_id = absint( $cat_id );
+                if ( $cat_id && is_array( $tags ) ) {
+                    $clean_tags = array_filter( array_map( 'sanitize_text_field', $tags ) );
+                    if ( ! empty( $clean_tags ) ) {
+                        $sanitized_mappings[ $cat_id ] = array_values( array_unique( $clean_tags ) );
+                    }
+                }
+            }
+        }
+
+        update_option( Axxanoid_Marketplace_Settings::CATEGORY_TAG_MAP_OPTION, $sanitized_mappings );
+        wp_send_json_success( 'Mappings saved successfully.' );
+    }
+
+	/**
+     * AJAX: The "Run Now" retroactive categorizer.
+     */
+    public function ajax_run_retroactive_sync() {
+        check_ajax_referer( self::AJAX_SEARCH_NONCE, 'nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( 'Permission denied.' );
+
+        // TO-DO: When we build the WooCommerce product injection, we will 
+        // add the loop here to query all 'external' products and update their categories.
+        
+        wp_send_json_success( 'Retroactive sync complete. (Loop logic pending Woo integration)' );
+    }
 }

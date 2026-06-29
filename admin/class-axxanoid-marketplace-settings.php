@@ -91,7 +91,7 @@ class Axxanoid_Marketplace_Settings {
 			'current_portfolio_product', 
 			'Current Protfolio Woo ID', 
 			array( $this, 'render_text_field' ), 
-			'axxanoid-maeketplace-settings', 
+			'axxanoid-marketplace-settings', 
 			'axxanoid_marketplace_url_section', 
 			array( 
 				'key' => 'current_portfolio_product', 
