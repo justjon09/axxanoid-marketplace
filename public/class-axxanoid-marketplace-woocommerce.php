@@ -46,8 +46,7 @@ class Axxanoid_Marketplace_WooCommerce {
 		
 		if ( empty( $product_id ) ) {
 			$options = get_option( 'axxanoid_marketplace_settings', array() );
-			// Note: ensure this key matches what you saved in settings
-			$product_id = isset( $options['default_subscription_product_id'] ) ? absint( $options['default_subscription_product_id'] ) : 0;
+			$product_id = isset( $options['current_maker_profile_product'] ) ? absint( $options['current_maker_profile_product'] ) : 0;
 			
 			// Lock this price in for their profile
 			if ( $product_id ) {
@@ -80,18 +79,19 @@ class Axxanoid_Marketplace_WooCommerce {
 
 	/**
 	 * Stamps the WooCommerce order with the Maker ID before checkout finishes.
+     * Updated for HPOS compatibility.
 	 */
 	public function stamp_order_with_market_maker_id( $order_id ) {
 		if ( isset( WC()->session ) ) {
 			$maker_id = WC()->session->get( 'axx_market_claiming_maker_id' );
 			
 			if ( $maker_id ) {
-				// Highly specific meta key to avoid Directory collisions
-				update_post_meta( $order_id, '_axx_market_maker_id', $maker_id );
-				
 				$order = wc_get_order( $order_id );
 				if ( $order ) {
+                    // Use native Woo methods for HPOS support instead of update_post_meta
+                    $order->update_meta_data( '_axx_market_maker_id', $maker_id );
 					$order->add_order_note( 'Marketplace Inbound: Maker ID ' . $maker_id . ' is paying their digital rent.' );
+                    $order->save();
 				}
 			}
 		}
@@ -99,12 +99,17 @@ class Axxanoid_Marketplace_WooCommerce {
 
 	/**
 	 * When the order is successfully paid, mark the Maker Profile as 'Active' and extend trial.
+     * Updated for HPOS compatibility.
 	 */
 	public function process_market_maker_payment( $order_id ) {
-		$already_processed = get_post_meta( $order_id, '_axx_market_claim_processed', true );
+        $order = wc_get_order( $order_id );
+        if ( ! $order ) return;
+
+        // Check if already processed using Woo methods
+		$already_processed = $order->get_meta( '_axx_market_claim_processed' );
 		if ( $already_processed ) return;
 
-		$maker_id = get_post_meta( $order_id, '_axx_market_maker_id', true );
+		$maker_id = $order->get_meta( '_axx_market_maker_id' );
 		
 		if ( $maker_id ) {
 			// Flip their status
@@ -133,7 +138,9 @@ class Axxanoid_Marketplace_WooCommerce {
 				'post_status' => 'publish'
 			) );
 
-			update_post_meta( $order_id, '_axx_market_claim_processed', true );
+            // Mark order as processed via HPOS methods
+            $order->update_meta_data( '_axx_market_claim_processed', true );
+            $order->save();
 			
 			if ( isset( WC()->session ) ) {
 				WC()->session->__unset( 'axx_market_claiming_maker_id' );
