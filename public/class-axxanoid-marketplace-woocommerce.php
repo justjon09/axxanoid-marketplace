@@ -1,0 +1,143 @@
+<?php
+/**
+ * Handles WooCommerce AJAX cart interception, session management, and order fulfillment.
+ *
+ * @package Axxanoid_Marketplace
+ */
+
+if ( ! defined( 'WPINC' ) ) {
+	die;
+}
+
+class Axxanoid_Marketplace_WooCommerce {
+
+	public function __construct() {
+		// 1. Isolated AJAX Handlers to prep the cart and session
+		add_action( 'wp_ajax_axx_market_set_claim_session', array( $this, 'ajax_set_market_claim_session' ) );
+		add_action( 'wp_ajax_nopriv_axx_market_set_claim_session', array( $this, 'ajax_set_market_claim_session' ) );
+
+		// 2. Stamp the WooCommerce Order with the Maker ID upon checkout
+		add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'stamp_order_with_market_maker_id' ) );
+
+		// 3. Fulfill the Order: Flip the Maker Status to 'Active' when paid
+		add_action( 'woocommerce_payment_complete', array( $this, 'process_market_maker_payment' ) );
+		add_action( 'woocommerce_order_status_completed', array( $this, 'process_market_maker_payment' ) );
+		add_action( 'woocommerce_order_status_processing', array( $this, 'process_market_maker_payment' ) );
+	}
+
+	/**
+	 * AJAX: Intercepts the click, natively clears cart, adds Rent product, and sets isolated session.
+	 */
+	public function ajax_set_market_claim_session() {
+		check_ajax_referer( 'axx_market_public_nonce', 'nonce' );
+
+		if ( ! function_exists( 'WC' ) ) {
+			wp_send_json_error( 'WooCommerce is not active.' );
+		}
+
+		$maker_id = isset( $_POST['maker_id'] ) ? absint( $_POST['maker_id'] ) : 0;
+
+		if ( ! $maker_id || get_post_type( $maker_id ) !== 'axx_market_maker' ) {
+			wp_send_json_error( 'Invalid Maker Profile.' );
+		}
+
+		// Determine which subscription product to sell them
+		$product_id = get_post_meta( $maker_id, 'locked_in_product_id', true );
+		
+		if ( empty( $product_id ) ) {
+			$options = get_option( 'axxanoid_marketplace_settings', array() );
+			// Note: ensure this key matches what you saved in settings
+			$product_id = isset( $options['default_subscription_product_id'] ) ? absint( $options['default_subscription_product_id'] ) : 0;
+			
+			// Lock this price in for their profile
+			if ( $product_id ) {
+				update_post_meta( $maker_id, 'locked_in_product_id', $product_id );
+			}
+		}
+
+		if ( ! $product_id ) {
+			wp_send_json_error( 'Marketplace subscription product not configured.' );
+		}
+
+		// Initialize Woo Session
+		if ( isset( WC()->session ) ) {
+			if ( ! WC()->session->has_session() ) {
+				WC()->session->set_customer_session_cookie( true );
+			}
+
+			// Lock the Maker ID into their backend session natively (Isolated naming)
+			WC()->session->set( 'axx_market_claiming_maker_id', $maker_id );
+
+			// Empty the cart to prevent double-billing and add the rent invoice
+			WC()->cart->empty_cart();
+			WC()->cart->add_to_cart( $product_id );
+
+			wp_send_json_success( 'Session set and cart prepared.' );
+		}
+
+		wp_send_json_error( 'Failed to initialize session.' );
+	}
+
+	/**
+	 * Stamps the WooCommerce order with the Maker ID before checkout finishes.
+	 */
+	public function stamp_order_with_market_maker_id( $order_id ) {
+		if ( isset( WC()->session ) ) {
+			$maker_id = WC()->session->get( 'axx_market_claiming_maker_id' );
+			
+			if ( $maker_id ) {
+				// Highly specific meta key to avoid Directory collisions
+				update_post_meta( $order_id, '_axx_market_maker_id', $maker_id );
+				
+				$order = wc_get_order( $order_id );
+				if ( $order ) {
+					$order->add_order_note( 'Marketplace Inbound: Maker ID ' . $maker_id . ' is paying their digital rent.' );
+				}
+			}
+		}
+	}
+
+	/**
+	 * When the order is successfully paid, mark the Maker Profile as 'Active' and extend trial.
+	 */
+	public function process_market_maker_payment( $order_id ) {
+		$already_processed = get_post_meta( $order_id, '_axx_market_claim_processed', true );
+		if ( $already_processed ) return;
+
+		$maker_id = get_post_meta( $order_id, '_axx_market_maker_id', true );
+		
+		if ( $maker_id ) {
+			// Flip their status
+			update_post_meta( $maker_id, 'marketplace_status', 'Active' );
+			
+			// Log the active order ID
+			update_post_meta( $maker_id, 'subscription_order_id', $order_id );
+
+			// Query Maker for existing expiration date to stack time safely
+			$existing_expiration = get_post_meta( $maker_id, 'trial_expiration_date', true );
+			$base_time = time(); // Default baseline is right now
+			if ( ! empty( $existing_expiration ) ) {
+				$existing_timestamp = strtotime( $existing_expiration );
+				if ( $existing_timestamp > $base_time ) {
+					$base_time = $existing_timestamp;
+				}
+			}
+
+			// Add 30 days to their expiration
+			$expiration_date = gmdate( 'Y-m-d', strtotime( '+30 days', $base_time ) );
+			update_post_meta( $maker_id, 'trial_expiration_date', $expiration_date );
+			
+			// Ensure the profile is actually published
+			wp_update_post( array(
+				'ID'          => $maker_id,
+				'post_status' => 'publish'
+			) );
+
+			update_post_meta( $order_id, '_axx_market_claim_processed', true );
+			
+			if ( isset( WC()->session ) ) {
+				WC()->session->__unset( 'axx_market_claiming_maker_id' );
+			}
+		}
+	}
+}

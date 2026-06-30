@@ -38,6 +38,14 @@ final class Axxanoid_Marketplace_Init {
         require_once AXX_MARKET_PLUGIN_DIR . 'public/class-axxanoid-marketplace-api.php';
         new Axxanoid_Marketplace_API();
 
+		// Load the Frontend Enqueuer
+		require_once AXX_MARKET_PLUGIN_DIR . 'public/class-axxanoid-marketplace-public.php';
+		new Axxanoid_Marketplace_Public();
+
+		// Load WooCommerce AJAX Interceptors globally
+		require_once AXX_MARKET_PLUGIN_DIR . 'public/class-axxanoid-marketplace-woocommerce.php';
+		new Axxanoid_Marketplace_WooCommerce();
+
         // Admin-facing functionality
 		if ( is_admin() ) {
             // Load the meta box handler for the Maker editor.
