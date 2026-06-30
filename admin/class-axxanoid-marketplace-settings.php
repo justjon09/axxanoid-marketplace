@@ -24,7 +24,6 @@ class Axxanoid_Marketplace_Settings {
 	 * The option name in the wp_options table.
 	 */
 	const OPTION_NAME  = 'axxanoid_marketplace_settings';
-
 	const CATEGORY_TAG_MAP_OPTION = 'axx_market_category_tag_map';
 
 	/**
@@ -56,38 +55,9 @@ class Axxanoid_Marketplace_Settings {
 			'axxanoid_marketplace_url_section', 
 			array( 
 				'key' => 'maker_base_slug', 
-				'default' => 'makers',
-				// TO-DO can this be averagestoner.com/marketplace/makers/<maker>
-				'desc'    => 'The base URL for the marketplace makers (e.g., averagestoner.com/<strong>makers</strong>/). Changing this requires flushing rewrite rules (visit Settings > Permalinks).'
+				'default' => 'marketplace/makers',
+				'desc'    => 'The base URL for the marketplace makers (e.g., averagestoner.com/<strong>marketplace/makers</strong>/). Changing this requires flushing rewrite rules (visit Settings > Permalinks).'
 			)
-		);
-
-		add_settings_field( 
-			'maker_profile_claim_link', 
-			'Maker Profile Claim Link', 
-			array( $this, 'render_text_field' ), 
-			'axxanoid-marketplace-settings', 
-			'axxanoid_marketplace_url_section', 
-			array( 
-				'key' => 'maker_profile_claim_link',
-				// TO-DO can this be averagestoner.com/marketplace/maker-verification or averagestoner.com/marketplace/makers/maker-verification
-				'default' => '/maker-verification', 
-				'desc' => 'Used in non-premimum maker profile banner.' 
-			) 
-		);
-
-		add_settings_field( 
-			'maker_profile_renewal_link', 
-			'Maker Profile Renewal Link', 
-			array( $this, 'render_text_field' ), 
-			'axxanoid-marketplace-settings', 
-			'axxanoid_marketplace_url_section', 
-			array( 
-				'key' => 'maker_profile_renewal_link', 
-				// TO-DO can this be averagestoner.com/marketplace/maker-renew or averagestoner.com/marketplace/makers/maker-renew
-				'default' => '/maker-renew', 
-				'desc' => 'The URL of the landing page where users are sent to renew their profile.' 
-			) 
 		);
 
 		add_settings_field( 
@@ -112,7 +82,7 @@ class Axxanoid_Marketplace_Settings {
 				'key' => 'marketplace_scrape_keywords',
 				// TO-DO use product categories include hiarchy -- ensure scapper priorities direct input over cats
 				'default' => 'dab rig, rolling tray, bong, glass pipe',
-				'desc'    => 'Comma-separated keywords.'
+				'desc'    => 'Comma-separated keywords for the Python drones.'
 			)
 		);
 
@@ -250,20 +220,6 @@ class Axxanoid_Marketplace_Settings {
 		}
 	}
 
-	public function render_number_field( $args ) {
-		$options = get_option( self::OPTION_NAME, array() );
-		$value   = isset( $options[ $args['key'] ] ) ? $options[ $args['key'] ] : $args['default'];
-
-		printf( '<input type="number" step="1" name="%1$s[%2$s]" id="%2$s" value="%3$s" class="small-text" />', 
-			esc_attr( self::OPTION_NAME ),
-			esc_attr( $args['key'] ),
-			esc_attr( $value )
-		);
-		if ( isset( $args['desc'] ) ) {
-			echo '<p class="description">' . wp_kses_post( $args['desc'] ) . '</p>';
-		}
-	}
-
 	public function render_textarea_field( $args ) {
 		$options = get_option( self::OPTION_NAME, array() );
 		$value   = isset( $options[ $args['key'] ] ) ? $options[ $args['key'] ] : $args['default'];
@@ -297,12 +253,6 @@ class Axxanoid_Marketplace_Settings {
 		$sanitized_input = array();
 		if ( isset( $input['maker_base_slug'] ) ) {
 			 $sanitized_input['maker_base_slug'] = sanitize_key( $input['maker_base_slug'] );
-		}
-		if ( isset( $input['maker_profile_claim_link'] ) ) {
-			$sanitized_input['maker_profile_claim_link'] = esc_url_raw( $input['maker_profile_claim_link'] );
-		}
-		if ( isset( $input['maker_profile_renewal_link'] ) ) {
-			$sanitized_input['maker_profile_renewal_link'] = esc_url_raw( $input['maker_profile_renewal_link'] );
 		}
 		if ( isset( $input['current_maker_profile_product'] ) ) {
 			$sanitized_input['current_maker_profile_product'] = sanitize_text_field( $input['current_maker_profile_product'] );

@@ -36,25 +36,41 @@ class Axxanoid_Marketplace_WooCommerce {
 		}
 
 		$maker_id = isset( $_POST['maker_id'] ) ? absint( $_POST['maker_id'] ) : 0;
+        $provided_token = isset( $_POST['token'] ) ? sanitize_text_field( wp_unslash( $_POST['token'] ) ) : '';
 
 		if ( ! $maker_id || get_post_type( $maker_id ) !== 'axx_market_maker' ) {
 			wp_send_json_error( 'Invalid Maker Profile.' );
 		}
 
-		// Determine which subscription product to sell them
-		$product_id = get_post_meta( $maker_id, 'locked_in_product_id', true );
-		
-		if ( empty( $product_id ) ) {
-			$options = get_option( 'axxanoid_marketplace_settings', array() );
-			$product_id = isset( $options['current_maker_profile_product'] ) ? absint( $options['current_maker_profile_product'] ) : 0;
+        $status = get_post_meta( $maker_id, 'marketplace_status', true ) ?: 'Trial';
+		$saved_token = get_post_meta( $maker_id, '_axx_market_claim_token', true );
+
+        $options = get_option( 'axxanoid_marketplace_settings', array() );
+		$current_default_product = isset( $options['current_maker_profile_product'] ) ? absint( $options['current_maker_profile_product'] ) : 0;
+		$product_id = 0;
+
+        // --- THE SECURE PRICING ENGINE ---
+		if ( $status === 'Expired' || empty( $provided_token ) || $provided_token !== $saved_token ) {
+			// Penalty: They expired, or lack authorization token. Force current market rate.
+			$product_id = $current_default_product;
 			
-			// Lock this price in for their profile
+			// Lock them into the new, higher price going forward
 			if ( $product_id ) {
 				update_post_meta( $maker_id, 'locked_in_product_id', $product_id );
 			}
+		} else {
+			// Reward: They are Trial or Active AND have a valid token. Honor the grandfathered price.
+			$product_id = get_post_meta( $maker_id, 'locked_in_product_id', true );
+			
+			if ( empty( $product_id ) ) {
+				$product_id = $current_default_product;
+				if ( $product_id ) {
+					update_post_meta( $maker_id, 'locked_in_product_id', $product_id );
+				}
+			}
 		}
 
-		if ( ! $product_id ) {
+        if ( ! $product_id ) {
 			wp_send_json_error( 'Marketplace subscription product not configured.' );
 		}
 
@@ -70,6 +86,10 @@ class Axxanoid_Marketplace_WooCommerce {
 			// Empty the cart to prevent double-billing and add the rent invoice
 			WC()->cart->empty_cart();
 			WC()->cart->add_to_cart( $product_id );
+
+            // Telemetry
+			$clicks = (int) get_post_meta( $maker_id, 'checkout_clicks', true );
+			update_post_meta( $maker_id, 'checkout_clicks', $clicks + 1 );
 
 			wp_send_json_success( 'Session set and cart prepared.' );
 		}

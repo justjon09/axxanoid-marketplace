@@ -91,6 +91,8 @@ class Axxanoid_Marketplace_CPT {
 			'woo_brand_id' 			=> array( 'type' => 'integer', 'default' => 0 ), // Links CPT to Woo Taxonomy
 			'locked_in_product_id'  => array( 'type' => 'string', 'default' => '' ), // Which woo sub they buy
 			'subscription_order_id' => array( 'type' => 'string', 'default' => '' ), // Active order tracking
+			// Secure Token
+			'marketplace_renewal_claim_token' => array( 'type' => 'string', 'default' => '' ),
 		);
 
 		foreach ( $meta_fields as $meta_key => $args ) {

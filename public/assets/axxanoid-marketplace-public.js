@@ -7,11 +7,15 @@
 
 		// --- Marketplace Direct Cart Push (Impulse Flow) ---
 		$('.axx-market-claim-btn').on('click', function(e) {
-			e.preventDefault(); // Stop the immediate redirect
+			e.preventDefault(); 
 			
 			var $btn = $(this);
 			var makerId = $btn.data('maker-id');
 			var targetUrl = $btn.attr('href'); // e.g., "/checkout/"
+
+			// Extract the secure token from the URL (for early renewals or authorized claims)
+			var urlParams = new URLSearchParams(window.location.search);
+			var secureToken = urlParams.get('marketplace_token');
 
 			// Visual feedback
 			$btn.text('Preparing Checkout...').css('opacity', '0.8').prop('disabled', true);
@@ -20,7 +24,8 @@
 			$.post(axxMarketAjax.ajax_url, {
 				action: 'axx_market_set_claim_session',
 				nonce: axxMarketAjax.nonce,
-				maker_id: makerId
+				maker_id: makerId,
+				token: secureToken
 			}).done(function(response) {
 				console.log("Marketplace Cart Push Response: ", response);
 				if (response.success) {
