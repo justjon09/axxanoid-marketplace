@@ -57,56 +57,60 @@ class Axxanoid_Marketplace_Settings {
 			array( 
 				'key' => 'maker_base_slug', 
 				'default' => 'makers',
-				'desc'    => 'The base URL for your directory (e.g., averagestoner.com/<strong>makers</strong>/). Changing this requires flushing rewrite rules (visit Settings > Permalinks).'
+				// TO-DO can this be averagestoner.com/marketplace/makers/<maker>
+				'desc'    => 'The base URL for the marketplace makers (e.g., averagestoner.com/<strong>makers</strong>/). Changing this requires flushing rewrite rules (visit Settings > Permalinks).'
 			)
 		);
 
 		add_settings_field( 
-			'profile_claim_link', 
+			'maker_profile_claim_link', 
 			'Maker Profile Claim Link', 
 			array( $this, 'render_text_field' ), 
 			'axxanoid-marketplace-settings', 
 			'axxanoid_marketplace_url_section', 
 			array( 
-				'key' => 'profile_claim_link', 
+				'key' => 'maker_profile_claim_link',
+				// TO-DO can this be averagestoner.com/marketplace/maker-verification or averagestoner.com/marketplace/makers/maker-verification
 				'default' => '/maker-verification', 
 				'desc' => 'Used in non-premimum maker profile banner.' 
 			) 
 		);
 
 		add_settings_field( 
-			'profile_renewal_link', 
+			'maker_profile_renewal_link', 
 			'Maker Profile Renewal Link', 
 			array( $this, 'render_text_field' ), 
 			'axxanoid-marketplace-settings', 
 			'axxanoid_marketplace_url_section', 
 			array( 
-				'key' => 'profile_renewal_link', 
+				'key' => 'maker_profile_renewal_link', 
+				// TO-DO can this be averagestoner.com/marketplace/maker-renew or averagestoner.com/marketplace/makers/maker-renew
 				'default' => '/maker-renew', 
 				'desc' => 'The URL of the landing page where users are sent to renew their profile.' 
 			) 
 		);
 
 		add_settings_field( 
-			'current_portfolio_product', 
-			'Current Protfolio Woo ID', 
+			'current_maker_profile_product', 
+			'Current Maker Profile Product Woo ID', 
 			array( $this, 'render_text_field' ), 
 			'axxanoid-marketplace-settings', 
 			'axxanoid_marketplace_url_section', 
 			array( 
-				'key' => 'current_portfolio_product', 
-				'desc'    => 'The woocommerce ID for the product ccurrently sold as profolio subscription.'
+				'key' => 'current_maker_profile_product', 
+				'desc'    => 'The woocommerce ID for the product ccurrently sold as maker profile subscription.'
 			)
 		);
 
 		add_settings_field( 
-			'scrape_keywords', 
+			'marketplace_scrape_keywords', 
 			'Scraper Target Keywords', 
 			array( $this, 'render_text_field' ), 
 			'axxanoid-marketplace-settings', 
 			'axxanoid_marketplace_url_section', 
 			array( 
-				'key' => 'scrape_keywords', 
+				'key' => 'marketplace_scrape_keywords',
+				// TO-DO use product categories include hiarchy -- ensure scapper priorities direct input over cats
 				'default' => 'dab rig, rolling tray, bong, glass pipe',
 				'desc'    => 'Comma-separated keywords.'
 			)
@@ -122,100 +126,100 @@ class Axxanoid_Marketplace_Settings {
 
 		// Trial Expiring Warnings -- second pitch
 		add_settings_field( 
-			'email_trial_expire_subject', 
-			'Trial Expiring Subject', 
+			'email_maker_trial_expire_subject', 
+			'Maker Profile Trial Expiring - Subject', 
 			array( $this, 'render_text_field' ), 
 			'axxanoid-marketplace-settings', 
 			'axxanoid_marketplace_email_section', 
 			array( 
-				'key' => 'email_trial_expire_subject', 
+				'key' => 'email_maker_trial_expire_subject', 
 				'default' => 'Your Free Marketplace Trial is ending soon.' 
 			) 
 		);
 
 		add_settings_field( 
-			'email_trial_expire_body', 
-			'Trial Expiring Body', 
+			'email_maker_trial_expire_body', 
+			'Maker Trial Expiring - Body', 
 			array( $this, 'render_textarea_field' ), 
 			'axxanoid-marketplace-settings', 
 			'axxanoid_marketplace_email_section', 
 			array( 
-				'key' => 'email_trial_expire_body', 
+				'key' => 'email_maker_trial_expire_body', 
 				'default' => "Hi [maker_name],\n\nYour Avetage Stoner Marketplace portfolio expires on [expiration_date].\n\nDon't lose your spot at the top of the search results! Secure your permanent ranking by locking in an official subscription today:\n\n[checkout_url]" 
 			) 
 		);
 
 		// Profile set to draft -- expired
 		add_settings_field( 
-			'email_draft_profile_subject', 
-			'Maker to Draft Subject', 
+			'email_draft_maker_profile_subject', 
+			'Maker Profile to Draft - Subject', 
 			array( $this, 'render_text_field' ), 
 			'axxanoid-marketplace-settings', 
 			'axxanoid_marketplace_email_section', 
 			array( 
-				'key' => 'email_draft_profile_subject', 
-				'default' => 'Your Marketplace portfolio is not public.' 
+				'key' => 'email_draft_maker_profile_subject', 
+				'default' => 'Your Average Stoner Marketplace portfolio is not public.' 
 			) 
 		);
 
 		add_settings_field( 
-			'email_draft_profile_body', 
-			'Trial Expiring Body', 
+			'email_draft_maker_profile_body', 
+			'Maker Profile to Draft - Body',
 			array( $this, 'render_textarea_field' ), 
 			'axxanoid-marketplace-settings', 
 			'axxanoid_marketplace_email_section', 
 			array( 
-				'key' => 'email_draft_profile_body', 
+				'key' => 'email_draft_maker_profile_body', 
 				'default' => "Hi [maker_name],\n\nYour Avetage Stoner Marketplace portfolio expired on [expiration_date].\n\nDon't lose your spot at the top of the search results! Secure your permanent ranking by locking in an official subscription today:\n\n[checkout_url]" 
 			) 
 		);
 
 		// Products removal warning -- expired for 45 days - final. 
 		add_settings_field( 
-			'email_remove_subject', 
-			'Products Removal Warning Subject', 
+			'email_maker_product_remove_subject', 
+			'Maker Products Removal Warning - Subject', 
 			array( $this, 'render_text_field' ), 
 			'axxanoid-marketplace-settings', 
 			'axxanoid_marketplace_email_section', 
 			array( 
-				'key' => 'email_remove_subject', 
+				'key' => 'email_maker_product_remove_subject', 
 				'default' => 'Your products to be reomved from Average Stoner.' 
 			) 
 		);
 
 		add_settings_field( 
-			'email_remove_body', 
-			'Products Removal Warning Body', 
+			'email_maker_product_remove_body', 
+			'Maker Products Removal Warning - Body', 
 			array( $this, 'render_textarea_field' ), 
 			'axxanoid-marketplace-settings', 
 			'axxanoid_marketplace_email_section', 
 			array( 
-				'key' => 'email_remove_body', 
+				'key' => 'email_maker_product_remove_body', 
 				'default' => "Hi [maker_name],\n\nYour Avetage Stoner Marketplace portfolio expired on [expiration_date].\n\nDon't lose your spot at the top of the search results! Secure your permanent ranking by locking in an official subscription today:\n\n[checkout_url]" 
 			) 
 		);
 
 		// 10-Day Warning -- renewal 
 		add_settings_field( 
-			'email_renewal_subject', 
-			'10-Day Notice Subject', 
+			'email_maker_profile_renewal_subject', 
+			'10-Day Notice to Renew Maker Profile - Subject', 
 			array( $this, 'render_text_field' ), 
 			'axxanoid-marketplace-settings', 
 			'axxanoid_marketplace_email_section', 
 			array( 
-				'key' => 'email_renewal_subject', 
+				'key' => 'email_maker_profile_renewal_subject', 
 				'default' => 'NOTICE: You are about to lose your marketplace portfolio.' 
 			)
 		);
 
 		add_settings_field( 
-			'email_renewal_body', 
-			'10-Day Notice Body', 
+			'email_maker_profile_renewal_body', 
+			'10-Day Notice to Renew Maker Profile - Body', 
 			array( $this, 'render_textarea_field' ), 
 			'axxanoid-marketplace-settings', 
 			'axxanoid_marketplace_email_section', 
 			array( 
-				'key' => 'email_renewal_body', 
+				'key' => 'email_maker_profile_renewal_body', 
 				'default' => "Hi [maker_name],\n\nThis is your friendly reminder, your lmker portfolio expires in 10 days on [expiration_date].\n\nIf your listing lapses to 'Free' status, your portfolio will not be publicly viewable. To reinstate your maker portfolio later, you will have to email us directly.\n\nRenew now to secure your spot:\n[checkout_url]" 
 			) 
 		);
@@ -294,35 +298,41 @@ class Axxanoid_Marketplace_Settings {
 		if ( isset( $input['maker_base_slug'] ) ) {
 			 $sanitized_input['maker_base_slug'] = sanitize_key( $input['maker_base_slug'] );
 		}
-		if ( isset( $input['profile_claim_link'] ) ) {
-			$sanitized_input['profile_claim_link'] = esc_url_raw( $input['profile_claim_link'] );
+		if ( isset( $input['maker_profile_claim_link'] ) ) {
+			$sanitized_input['maker_profile_claim_link'] = esc_url_raw( $input['maker_profile_claim_link'] );
 		}
-		if ( isset( $input['profile_renewal_link'] ) ) {
-			$sanitized_input['profile_renewal_link'] = esc_url_raw( $input['profile_renewal_link'] );
+		if ( isset( $input['maker_profile_renewal_link'] ) ) {
+			$sanitized_input['maker_profile_renewal_link'] = esc_url_raw( $input['maker_profile_renewal_link'] );
 		}
-		if ( isset( $input['current_portfolio_product'] ) ) {
-			$sanitized_input['current_portfolio_product'] = sanitize_text_field( $input['current_portfolio_product'] );
+		if ( isset( $input['current_maker_profile_product'] ) ) {
+			$sanitized_input['current_maker_profile_product'] = sanitize_text_field( $input['current_maker_profile_product'] );
 		}
-		if ( isset( $input['scrape_keywords'] ) ) {
-			$sanitized_input['scrape_keywords'] = sanitize_text_field( $input['scrape_keywords'] );
+		if ( isset( $input['marketplace_scrape_keywords'] ) ) {
+			$sanitized_input['marketplace_scrape_keywords'] = sanitize_text_field( $input['marketplace_scrape_keywords'] );
 		}
-		if ( isset( $input['email_trial_expire_subject'] ) ) {
-			$sanitized_input['email_trial_expire_subject'] = sanitize_text_field( $input['email_trial_expire_subject'] );
+		if ( isset( $input['email_maker_trial_expire_subject'] ) ) {
+			$sanitized_input['email_maker_trial_expire_subject'] = sanitize_text_field( $input['email_maker_trial_expire_subject'] );
 		}
-		if ( isset( $input['email_trial_expire_body'] ) ) {
-			$sanitized_input['email_trial_expire_body'] = wp_kses_post( $input['email_trial_expire_body'] );
+		if ( isset( $input['email_maker_trial_expire_body'] ) ) {
+			$sanitized_input['email_maker_trial_expire_body'] = wp_kses_post( $input['email_maker_trial_expire_body'] );
 		}
-		if ( isset( $input['email_draft_profile_subject'] ) ){
-			$sanitized_input['email_draft_profile_subject'] = sanitize_text_field( $input['email_draft_profile_subject'] );
+		if ( isset( $input['email_draft_maker_profile_subject'] ) ){
+			$sanitized_input['email_draft_maker_profile_subject'] = sanitize_text_field( $input['email_draft_maker_profile_subject'] );
 		}
-		if ( isset( $input['email_draft_profile_body'] ) ) {
-			$sanitized_input['email_draft_profile_body'] = wp_kses_post( $input['email_draft_profile_body'] );
+		if ( isset( $input['email_draft_maker_profile_body'] ) ) {
+			$sanitized_input['email_draft_maker_profile_body'] = wp_kses_post( $input['email_draft_maker_profile_body'] );
 		}
-		if ( isset( $input['email_remove_subject'] ) ) {
-			$sanitized_input['email_remove_subject'] = sanitize_text_field( $input['email_remove_subject'] );
+		if ( isset( $input['email_maker_product_remove_subject'] ) ) {
+			$sanitized_input['email_maker_product_remove_subject'] = sanitize_text_field( $input['email_maker_product_remove_subject'] );
 		}
-		if ( isset( $input['email_remove_body'] ) ) {
-			$sanitized_input['email_remove_body'] = wp_kses_post( $input['email_remove_body'] );
+		if ( isset( $input['email_maker_product_remove_body'] ) ) {
+			$sanitized_input['email_maker_product_remove_body'] = wp_kses_post( $input['email_maker_product_remove_body'] );
+		}
+		if ( isset( $input['email_maker_profile_renewal_subject'] ) ) {
+			$sanitized_input['email_maker_profile_renewal_subject'] = wp_kses_post( $input['email_maker_profile_renewal_subject'] );
+		}
+		if ( isset( $input['email_maker_profile_renewal_body'] ) ) {
+			$sanitized_input['email_maker_profile_renewal_body'] = wp_kses_post( $input['email_maker_profile_renewal_body'] );
 		}
 						
 		return $sanitized_input;
