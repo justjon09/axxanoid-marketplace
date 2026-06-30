@@ -19,6 +19,10 @@ require_once AXX_MARKET_PLUGIN_DIR . 'admin/assets/css/axxanoid-admin-styles.css
         <input type="text" name="trial_expiration_date" id="trial_expiration_date" value="<?php echo esc_attr( $exp_date ); ?>" placeholder="YYYY-MM-DD" />
     </div>
     <div class="axx-market-row">
+        <label for="paid_expiration_date">Paid Sub Expiration</label>
+        <input type="text" name="paid_expiration_date" id="paid_expiration_date" value="<?php echo esc_attr( $sub_date ); ?>" placeholder="YYYY-MM-DD" />
+    </div>
+    <div class="axx-market-row">
         <label for="locked_in_product_id">Woo Sub Product ID</label>
         <input type="text" name="locked_in_product_id" id="locked_in_product_id" value="<?php echo esc_attr( $product_id ); ?>" placeholder="e.g., 100 for '$2.99 Rent'" />
     </div>

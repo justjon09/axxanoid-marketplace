@@ -161,8 +161,14 @@ class Axxanoid_Marketplace_Makers_List_Table extends WP_List_Table {
 				$added = get_the_date( '', $item->ID );
 				return $added ? esc_html( $added ) : '&mdash;';
 			case 'expiration':
-				$exp = get_post_meta( $item->ID, 'trial_expiration_date', true );
-				return $exp ? esc_html( $exp ) : '&mdash;';
+				$paid_exp = get_post_meta( $item->ID, 'paid_expiration_date', true );
+				if ( $paid_exp ) {
+					return esc_html( $paid_exp ) . ' <small>(Paid)</small>';
+
+				} else  {
+					$exp = get_post_meta( $item->ID, 'trial_expiration_date', true );
+					return $exp ? esc_html( $exp ) . ' <small>(Trial)</small>' : '&mdash;';
+				}				
 			case 'brand_id':
 				$brand = get_post_meta( $item->ID, 'woo_brand_id', true );
 				return $brand ? esc_html( $brand ) : '&mdash;';

@@ -138,19 +138,23 @@ class Axxanoid_Marketplace_WooCommerce {
 			// Log the active order ID
 			update_post_meta( $maker_id, 'subscription_order_id', $order_id );
 
-			// Query Maker for existing expiration date to stack time safely
-			$existing_expiration = get_post_meta( $maker_id, 'trial_expiration_date', true );
-			$base_time = time(); // Default baseline is right now
-			if ( ! empty( $existing_expiration ) ) {
-				$existing_timestamp = strtotime( $existing_expiration );
-				if ( $existing_timestamp > $base_time ) {
-					$base_time = $existing_timestamp;
-				}
+            // Query Maker for existing expiration date to stack time safely
+            $trial_expiration = get_post_meta( $maker_id, 'trial_expiration_date', true );
+			$sub_expiration   = get_post_meta( $maker_id, 'paid_expiration_date', true );
+            $base_time = time(); // Default baseline is right now
+
+            // If renewing an existing active sub, stack on top of it
+			if ( ! empty( $sub_expiration ) && strtotime( $sub_expiration ) > $base_time ) {
+				$base_time = strtotime( $sub_expiration );
+			} 
+			// Otherwise, if converting from an active Trial, stack on top of the remaining trial days
+			elseif ( ! empty( $trial_expiration ) && strtotime( $trial_expiration ) > $base_time ) {
+				$base_time = strtotime( $trial_expiration );
 			}
 
-			// Add 30 days to their expiration
+			// Add 30 days to their paid expiration
 			$expiration_date = gmdate( 'Y-m-d', strtotime( '+30 days', $base_time ) );
-			update_post_meta( $maker_id, 'trial_expiration_date', $expiration_date );
+			update_post_meta( $maker_id, 'paid_expiration_date', $expiration_date );
 			
 			// Ensure the profile is actually published
 			wp_update_post( array(

@@ -33,6 +33,7 @@ class Axxanoid_Marketplace_Meta_Box {
         // Fetch all the data to pass to the template
 		$status       = get_post_meta( $post->ID, 'marketplace_status', true ) ?: 'Trial';
 		$exp_date     = get_post_meta( $post->ID, 'trial_expiration_date', true );
+		$sub_date     = get_post_meta( $post->ID, 'paid_expiration_date', true );
 		$email        = get_post_meta( $post->ID, 'maker_email', true );
 		$maker_url    = get_post_meta( $post->ID, 'maker_url', true );
 		$pitch_date   = get_post_meta( $post->ID, 'pitch_sent_date', true );
@@ -53,6 +54,7 @@ class Axxanoid_Marketplace_Meta_Box {
 		$fields = array(
 			'marketplace_status'    => 'sanitize_text_field',
 			'trial_expiration_date' => 'sanitize_text_field',
+			'paid_expiration_date' => 'sanitize_text_field',
 			'maker_email'           => 'sanitize_email',
 			'maker_url'             => 'esc_url_raw',
 			'pitch_sent_date'       => 'sanitize_text_field',

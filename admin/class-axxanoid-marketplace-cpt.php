@@ -83,6 +83,7 @@ class Axxanoid_Marketplace_CPT {
 			// Subscription & Ego Trap Mechanics
 			'marketplace_status'    => array( 'type' => 'string', 'default' => 'Trial' ), // 'Trial', 'Active', 'Expired'
 			'trial_expiration_date' => array( 'type' => 'string', 'default' => '' ), // YYYY-MM-DD
+			'paid_expiration_date'  => array( 'type' => 'string', 'default' => '' ),
 			'pitch_sent_date'       => array( 'type' => 'string', 'default' => '' ), // YYYY-MM-DD
 			'followup_sent_date'    => array( 'type' => 'string', 'default' => '' ), // YYYY-MM-DD
 			'renewal_sent_date'     => array( 'type' => 'string', 'default' => '' ), // YYYY-MM-DD
