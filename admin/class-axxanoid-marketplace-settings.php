@@ -31,6 +31,9 @@ class Axxanoid_Marketplace_Settings {
 	 */
 	public function __construct() {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
+
+		// Auto-create the Hub page when settings are saved
+		add_action( 'update_option_' . self::OPTION_NAME, array( $this, 'auto_create_hub_page' ), 10, 3 );
 	}
 
 	/**
@@ -286,5 +289,32 @@ class Axxanoid_Marketplace_Settings {
 		}
 						
 		return $sanitized_input;
+	}
+
+	/**
+	 * Automatically generates the WordPress Page for the Marketplace Hub if it doesn't exist.
+	 */
+	public function auto_create_hub_page( $old_value, $new_value, $option ) {
+		$slug = isset( $new_value['maker_base_slug'] ) ? $new_value['maker_base_slug'] : 'marketplace/makers';
+		
+		// Extract the root slug (e.g., 'marketplace' from 'marketplace/makers')
+		$parts = explode( '/', trim( $slug, '/' ) );
+		$hub_slug = $parts[0];
+
+		// Check if the page already exists
+		$page = get_page_by_path( $hub_slug );
+
+		if ( ! $page ) {
+			wp_insert_post( array(
+				'post_title'   => ucfirst( $hub_slug ),
+				'post_name'    => $hub_slug,
+				'post_status'  => 'publish',
+				'post_type'    => 'page',
+				'post_content' => '',
+			) );
+		}
+
+		// Automatically flush rewrite rules so the new URL structure works immediately
+		flush_rewrite_rules();
 	}
 }

@@ -25,6 +25,8 @@ class Axxanoid_Marketplace_CPT {
 		add_action( 'init', array( $this, 'register_marketplace_meta' ) );
         // Link Woo Products to Makers
         add_action( 'init', array( $this, 'register_woocommerce_maker_link' ) );
+		// Block Jetpack from auto-sharing the CPT by default
+		add_filter( 'publicize_should_publicize_published_post', array( $this, 'restrict_cpt_auto_share' ), 10, 2 );
     }
 
     /**
@@ -118,5 +120,18 @@ class Axxanoid_Marketplace_CPT {
 			'type'          => 'integer',
 			'auth_callback' => function() { return current_user_can( 'edit_posts' ); }
 		) );
+	}
+	
+	/**
+	 * Block Jetpack from auto-sharing the CPT unless they are a paying 'Active' Maker.
+	 */
+	public function restrict_cpt_auto_share( $should_publicize, $post ) {
+		if ( 'axx_market_maker' === $post->post_type ) {
+			$status = get_post_meta( $post->ID, 'marketplace_status', true );
+			if ( $status !== 'Active' ) {
+				return false; // Blocks Jetpack from broadcasting automatically
+			}
+		}
+		return $should_publicize;
 	}
 }

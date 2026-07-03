@@ -155,6 +155,11 @@ class Axxanoid_Marketplace_WooCommerce {
 			// Add 30 days to their paid expiration
 			$expiration_date = gmdate( 'Y-m-d', strtotime( '+30 days', $base_time ) );
 			update_post_meta( $maker_id, 'paid_expiration_date', $expiration_date );
+
+			// --- THE JETPACK TRIGGER ---
+			// Clear Jetpack's 'already shared' flag and queue it for broadcast
+			delete_post_meta( $maker_id, '_publicize_done' );
+			update_post_meta( $maker_id, '_publicize_pending', 1 );
 			
 			// Ensure the profile is actually published
 			wp_update_post( array(
