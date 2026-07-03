@@ -132,12 +132,15 @@ class Axxanoid_Marketplace_WooCommerce {
 		$maker_id = $order->get_meta( '_axx_market_maker_id' );
 		
 		if ( $maker_id ) {
+			// Check previous status BEFORE update
+            $previous_status = get_post_meta( $maker_id, 'marketplace_status', true ) ?: 'Trial';
+            $woo_brand_id = get_post_meta( $maker_id, 'woo_brand_id', true );
 			// Flip their status
 			update_post_meta( $maker_id, 'marketplace_status', 'Active' );
-			
 			// Log the active order ID
 			update_post_meta( $maker_id, 'subscription_order_id', $order_id );
 
+			// --- DATE STACKING LOGIC ---
             // Query Maker for existing expiration date to stack time safely
             $trial_expiration = get_post_meta( $maker_id, 'trial_expiration_date', true );
 			$sub_expiration   = get_post_meta( $maker_id, 'paid_expiration_date', true );
@@ -155,12 +158,32 @@ class Axxanoid_Marketplace_WooCommerce {
 			// Add 30 days to their paid expiration
 			$expiration_date = gmdate( 'Y-m-d', strtotime( '+30 days', $base_time ) );
 			update_post_meta( $maker_id, 'paid_expiration_date', $expiration_date );
-
-			// --- THE JETPACK TRIGGER ---
-			// Clear Jetpack's 'already shared' flag and queue it for broadcast
-			delete_post_meta( $maker_id, '_publicize_done' );
-			update_post_meta( $maker_id, '_publicize_pending', 1 );
 			
+			// --- THE JETPACK TRIGGER ---
+            // Only trigger social sharing if they are converting from Trial for the first time
+            if ( $previous_status === 'Trial' ) {
+                // Clear Jetpack's 'already shared' flag and queue it for broadcast
+				delete_post_meta( $maker_id, '_publicize_done' );
+				update_post_meta( $maker_id, '_publicize_pending', 1 );
+            }
+
+			// --- THE PRODUCT REINSTATEMENT HOOK ---
+            // If paying to reactivate pull products back from the Affiliate Brand
+            if ( $previous_status === 'Expired' && ! empty( $woo_brand_id ) ) {
+				// Grab the comma-separated list of product IDs from the Maker CPT
+                $product_ids_string = get_post_meta( $maker_id, 'maker_product_ids', true );
+				if ( ! empty( $product_ids_string ) ) {
+                    $product_ids = explode( ',', $product_ids_string );
+					foreach ( $product_ids as $pid ) {
+                        $pid = absint( trim( $pid ) );
+                        if ( $pid ) {
+                            // Assuming 'brand' is your Woo taxonomy. Moves product back to Maker.
+                            wp_set_object_terms( $pid, (int) $woo_brand_id, 'brand', false );
+                        }
+                    }
+				}
+			}
+		
 			// Ensure the profile is actually published
 			wp_update_post( array(
 				'ID'          => $maker_id,

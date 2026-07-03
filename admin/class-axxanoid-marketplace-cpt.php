@@ -23,8 +23,6 @@ class Axxanoid_Marketplace_CPT {
 		add_action( 'init', array( $this, 'register_marketplace_maker_cpt' ) );
 		// Register Meta Fields for the REST API
 		add_action( 'init', array( $this, 'register_marketplace_meta' ) );
-        // Link Woo Products to Makers
-        add_action( 'init', array( $this, 'register_woocommerce_maker_link' ) );
 		// Block Jetpack from auto-sharing the CPT by default
 		add_filter( 'publicize_should_publicize_published_post', array( $this, 'restrict_cpt_auto_share' ), 10, 2 );
     }
@@ -94,6 +92,9 @@ class Axxanoid_Marketplace_CPT {
 			'woo_brand_id' 			=> array( 'type' => 'integer', 'default' => 0 ), // Links CPT to Woo Taxonomy
 			'locked_in_product_id'  => array( 'type' => 'string', 'default' => '' ), // Which woo sub they buy
 			'subscription_order_id' => array( 'type' => 'string', 'default' => '' ), // Active order tracking
+			// Comma-separated list of Woo Product IDs
+            'maker_product_ids'               => array( 'type' => 'string', 'default' => '' ),
+
 			// Secure Token
 			'marketplace_renewal_claim_token' => array( 'type' => 'string', 'default' => '' ),
 		);
@@ -107,19 +108,6 @@ class Axxanoid_Marketplace_CPT {
 				'auth_callback' => function() { return current_user_can( 'edit_posts' ); }
 			) );
 		}
-	}
-
-	/**
-	 * Allows WooCommerce products to be linked to an Axxanoid Maker via REST API.
-	 */
-	public function register_woocommerce_maker_link() {
-		// This tells WordPress to accept "_axx_maker_id" when Python creates a Woo Product
-		register_post_meta( 'product', '_axx_maker_id', array(
-			'show_in_rest'  => true,
-			'single'        => true,
-			'type'          => 'integer',
-			'auth_callback' => function() { return current_user_can( 'edit_posts' ); }
-		) );
 	}
 	
 	/**

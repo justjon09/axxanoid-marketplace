@@ -16,9 +16,15 @@ class Axxanoid_Marketplace_Public {
     }
 
     public function enqueue_public_scripts() {
+        // Fetch dynamic base slug to ensure we enqueue on the correct Hub page
+        $options = get_option( 'axxanoid_marketplace_settings', array() );
+        $base_slug = isset( $options['maker_base_slug'] ) ? $options['maker_base_slug'] : 'marketplace/makers';
+        $parts = explode( '/', trim( $base_slug, '/' ) );
+        $hub_slug = $parts[0];
+
         // Only load on Maker pages to save resources
         // Check if we are on ANY of the 3 Marketplace pages (Hub, Archive, Single Profile)
-        if ( is_singular( 'axx_market_maker' ) || is_post_type_archive( 'axx_market_maker' ) || is_page( 'marketplace' ) ) {
+        if ( is_singular( 'axx_market_maker' ) || is_post_type_archive( 'axx_market_maker' ) || is_page( $hub_slug ) ) {
 
             // Load Marketplace CSS/JS
             wp_enqueue_style( 
