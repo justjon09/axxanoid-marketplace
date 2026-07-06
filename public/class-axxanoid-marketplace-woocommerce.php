@@ -134,7 +134,6 @@ class Axxanoid_Marketplace_WooCommerce {
 		if ( $maker_id ) {
 			// Check previous status BEFORE update
             $previous_status = get_post_meta( $maker_id, 'marketplace_status', true ) ?: 'Trial';
-            $woo_brand_id = get_post_meta( $maker_id, 'woo_brand_id', true );
 			// Flip their status
 			update_post_meta( $maker_id, 'marketplace_status', 'Active' );
 			// Log the active order ID
@@ -166,24 +165,7 @@ class Axxanoid_Marketplace_WooCommerce {
 				delete_post_meta( $maker_id, '_publicize_done' );
 				update_post_meta( $maker_id, '_publicize_pending', 1 );
             }
-
-			// --- THE PRODUCT REINSTATEMENT HOOK ---
-            // If paying to reactivate pull products back from the Affiliate Brand
-            if ( $previous_status === 'Expired' && ! empty( $woo_brand_id ) ) {
-				// Grab the comma-separated list of product IDs from the Maker CPT
-                $product_ids_string = get_post_meta( $maker_id, 'maker_product_ids', true );
-				if ( ! empty( $product_ids_string ) ) {
-                    $product_ids = explode( ',', $product_ids_string );
-					foreach ( $product_ids as $pid ) {
-                        $pid = absint( trim( $pid ) );
-                        if ( $pid ) {
-                            // Assuming 'brand' is your Woo taxonomy. Moves product back to Maker.
-                            wp_set_object_terms( $pid, (int) $woo_brand_id, 'brand', false );
-                        }
-                    }
-				}
-			}
-		
+				
 			// Ensure the profile is actually published
 			wp_update_post( array(
 				'ID'          => $maker_id,

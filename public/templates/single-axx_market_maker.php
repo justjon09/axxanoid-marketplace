@@ -94,49 +94,53 @@ $is_authenticated = ( ! empty( $provided_token ) && $provided_token === $saved_t
     </header>
 
     <section class="axx-maker-products">
-        <h2>Featured Indie Finds</h2>
-        <?php
-        if ( ! empty( $brand_id ) && function_exists( 'WC' ) ) {
-            
-            // Query WooCommerce Products assigned to this Maker's Brand
-            $args = array(
-                'post_type'      => 'product',
-                'posts_per_page' => 12,
-                'post_status'    => 'publish',
-                'tax_query'      => array(
-                    array(
-                        'taxonomy' => 'brand', // Change this if you are using a different taxonomy for brands
-                        'field'    => 'term_id',
-                        'terms'    => $brand_id,
+        <?php if ( $status === 'Expired' ) : ?>
+            <div class="axx-market-empty-state" style="padding: 40px; text-align: center; background: #f9fafb; border: 1px dashed #e5e7eb; border-radius: 8px; margin-top: 30px;">
+                <h2 style="color: #9ca3af; margin-bottom: 10px;">Portfolio Inactive</h2>
+                <p style="color: #6b7280;">Your products have been removed from this directory listing. Please reactivate your rent to restore your public portfolio.</p>
+            </div>
+
+        <?php else :
+            echo '<h2>Featured Indie Finds</h2>';
+            if ( ! empty( $brand_id ) && function_exists( 'WC' ) ) {
+                // Query WooCommerce Products assigned to this Maker's Brand
+                $args = array(
+                    'post_type'      => 'product',
+                    'posts_per_page' => 12,
+                    'post_status'    => 'publish',
+                    'tax_query'      => array(
+                        array(
+                            'taxonomy' => 'brand',
+                            'field'    => 'term_id',
+                            'terms'    => $brand_id,
+                        ),
                     ),
-                ),
-            );
+                );
 
-            $products_query = new WP_Query( $args );
+                $products_query = new WP_Query( $args );
 
-            if ( $products_query->have_posts() ) {
-                
-                // We use native WooCommerce wrapper classes so the theme styles it properly
-                echo '<div class="woocommerce">';
-                echo '<ul class="products columns-4">';
-                
-                while ( $products_query->have_posts() ) {
-                    $products_query->the_post();
-                    // Load the native WooCommerce product card template
-                    wc_get_template_part( 'content', 'product' ); 
+                if ( $products_query->have_posts() ) {
+                    // We use native WooCommerce wrapper classes so the theme styles it properly
+                    echo '<div class="woocommerce">';
+                    echo '<ul class="products columns-4">';
+                    
+                    while ( $products_query->have_posts() ) {
+                        $products_query->the_post();
+                        // Load the native WooCommerce product card template
+                        wc_get_template_part( 'content', 'product' ); 
+                    }
+                    
+                    echo '</ul>';
+                    echo '</div>';
+                    
+                    wp_reset_postdata();
+                } else {
+                    echo '<p>No products are currently featured in this portfolio.</p>';
                 }
-                
-                echo '</ul>';
-                echo '</div>';
-                
-                wp_reset_postdata();
             } else {
-                echo '<p>No products are currently featured in this portfolio.</p>';
+                echo '<p>Maker brand connection missing.</p>';
             }
-        } else {
-            echo '<p>Maker brand connection missing.</p>';
-        }
-        ?>
+        endif ?>
     </section>
 
 </div><?php
