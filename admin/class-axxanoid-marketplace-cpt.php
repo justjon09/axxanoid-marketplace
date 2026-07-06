@@ -81,10 +81,11 @@ class Axxanoid_Marketplace_CPT {
 			'maker_email'         => array( 'type' => 'string', 'default' => '' ),
 			'maker_url'           => array( 'type' => 'string', 'default' => '' ), // Etsy/IG Outbound Link	
 			// Subscription & Ego Trap Mechanics
-			'marketplace_status'    => array( 'type' => 'string', 'default' => 'Trial' ), // 'Trial', 'Active', 'Expired'
+			'marketplace_status'    => array( 'type' => 'string', 'default' => 'Trial' ), // 'Trial', 'Active', 'Expired', 'Pending', 'Onboarding'
 			'trial_expiration_date' => array( 'type' => 'string', 'default' => '' ), // YYYY-MM-DD
-			'paid_expiration_date'  => array( 'type' => 'string', 'default' => '' ),
+			'paid_expiration_date'  => array( 'type' => 'string', 'default' => '' ), // YYYY-MM-DD
 			'pitch_sent_date'       => array( 'type' => 'string', 'default' => '' ), // YYYY-MM-DD
+			'onboard_sent_date'     => array( 'type' => 'string', 'default' => '' ), // YYYY-MM-DD
 			'followup_sent_date'    => array( 'type' => 'string', 'default' => '' ), // YYYY-MM-DD
 			'renewal_sent_date'     => array( 'type' => 'string', 'default' => '' ), // YYYY-MM-DD
 			
@@ -92,9 +93,10 @@ class Axxanoid_Marketplace_CPT {
 			'woo_brand_id' 			=> array( 'type' => 'integer', 'default' => 0 ), // Links CPT to Woo Taxonomy
 			'locked_in_product_id'  => array( 'type' => 'string', 'default' => '' ), // Which woo sub they buy
 			'subscription_order_id' => array( 'type' => 'string', 'default' => '' ), // Active order tracking
+            'maker_product_ids'     => array( 'type' => 'string', 'default' => '' ), // Comma-separated list of Woo Product IDs
 
-			// Secure Token
-			'marketplace_renewal_claim_token' => array( 'type' => 'string', 'default' => '' ),
+			// Secure Token used by Maker to view 'Onboarding' and/or 'Expired' profiles 
+			'marketplace_claim_token' => array( 'type' => 'string', 'default' => '' ),
 		);
 
 		foreach ( $meta_fields as $meta_key => $args ) {
