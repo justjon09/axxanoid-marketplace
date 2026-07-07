@@ -1,6 +1,6 @@
 <?php
 /**
- * The template for displaying a single Marketplace Maker profile.
+ * The template for displaying a single public Marketplace Maker profile.
  *
  * @package Axxanoid_Marketplace
  */
@@ -14,12 +14,6 @@ get_header();
 $maker_id = get_the_ID();
 $status   = get_post_meta( $maker_id, 'marketplace_status', true ) ?: 'Trial';
 $brand_id = get_post_meta( $maker_id, 'woo_brand_id', true );
-
-// Token Authentication Logic
-$provided_token   = isset( $_GET['marketplace_token'] ) ? sanitize_text_field( wp_unslash( $_GET['marketplace_token'] ) ) : '';
-$saved_token      = get_post_meta( $maker_id, '_axx_market_claim_token', true );
-$is_authenticated = ( ! empty( $provided_token ) && $provided_token === $saved_token );
-
 ?>
 
 <div class="axx-market-profile-container wrap">
@@ -33,27 +27,14 @@ $is_authenticated = ( ! empty( $provided_token ) && $provided_token === $saved_t
         ?>
         <div class="axx-market-banner axx-banner-warning">
             <div class="axx-banner-content">
-                <h3>Your Free Portfolio Expires in <?php echo intval( $days_left ); ?> Days</h3>
+                <h3>Free Portfolio Expires in <?php echo intval( $days_left ); ?> Days</h3>
                 <p>Lock in your spot at the top of our community search results for just $2.99 / 30 Days.</p>
             </div>
             <div class="axx-banner-action">
                 <a href="<?php echo esc_url( wc_get_checkout_url() ); ?>" class="axx-market-claim-btn button button-primary" data-maker-id="<?php echo esc_attr( $maker_id ); ?>">Lock In Your Spot</a>
             </div>
         </div>
-
-    <?php elseif ( $status === 'Expired' && $is_authenticated ) : ?>
-        
-        <div class="axx-market-banner axx-banner-danger">
-            <div class="axx-banner-content">
-                <h3>Profile Inactive</h3>
-                <p>Your rent has expired and your profile has been removed from the public directory. Reactivate now at current market rates to restore your visibility.</p>
-            </div>
-            <div class="axx-banner-action">
-                <a href="<?php echo esc_url( wc_get_checkout_url() ); ?>" class="axx-market-claim-btn button button-primary" data-maker-id="<?php echo esc_attr( $maker_id ); ?>">Reactivate Profile</a>
-            </div>
-        </div>
-
-    <?php elseif ( $status === 'Active' && $is_authenticated ) : ?>
+    <?php elseif ( $status === 'Active' ) : ?>
         
         <div class="axx-market-banner axx-banner-success">
             <div class="axx-banner-content">
