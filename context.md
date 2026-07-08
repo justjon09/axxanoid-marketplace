@@ -1466,3 +1466,78 @@ The API Endpoint: Add /pending-onboards for Python to read.
 Template Fixes: Fix the redirect crash in the router, and create the physical files for onboard, archive, and expired.
 
 I am entirely synced to this functional reality. Please tell me if this map is correct, and I am ready to execute the missing functional engines.
+
+........
+I have thoroughly read the context.md file and audited the 67d4628 codebase against it line-by-line.
+
+You did an excellent job compiling the history. I now have the complete, unadulterated picture of the architecture:
+
+The Brain: The CPT default is Trial. maker_product_ids tracks ownership. No wp_mail—date fields act as flags for Python.
+
+The Products: Affiliate/Maker categories are double-tagged at ingestion. "Punishment" is 100% visual (hiding the grid on the frontend). No database term reassignment.
+
+The Gatekeeper: Security is handled via the token marketplace_claim_token. Unauthorized access is gracefully redirected to the /marketplace/ hub.
+
+The Flow: Self-Serve inbound (Onboarding -> Pending -> Trial) vs. Drone Scraped (straight to Trial).
+
+Here is the precise, factual Master Blueprint. I have detailed exactly what is done, what is broken, and what is missing.
+
+THE MASTER BLUEPRINT: AXXANOID MARKETPLACE ENGINE
+🟢 PHASE 1: Core Schema & Fulfillment (The Foundation)
+The database rules, admin interfaces, and checkout handlers.
+
+Data Schema (CPT & Meta): * Status: COMPLETE. Default is Trial. All date flags (onboard_sent_date, pitch_sent_date), maker_product_ids, and marketplace_claim_token are accurately registered in class-axxanoid-marketplace-cpt.php.
+
+Admin UI (Meta Boxes & Mappers): * Status: COMPLETE. The meta box includes all 5 statuses (Onboarding, Pending Review, Trial, Active, Expired). The Vue mapper is intact.
+
+WooCommerce Urgency Engine (Cart Interceptor): * Status: COMPLETE. Accurately enforces token-based grandfathered pricing vs. penalty pricing in class-axxanoid-marketplace-woocommerce.php.
+
+WooCommerce Fulfillment Webhook: * Status: NEEDS FIX. The process_market_maker_payment function still contains the old block of code that loops through maker_product_ids to reassign WooCommerce brand taxonomies. Based on our "Visual Punishment Only" rule, this taxonomy-moving code must be deleted to keep the webhook lean.
+
+Admin Status Transition Engine: * Status: MISSING. We need a save_post hook. When you manually change a profile from Pending Review to Trial in the admin, the system must automatically stamp trial_expiration_date (+10 days) and trigger the Jetpack broadcast flag.
+
+🔴 PHASE 2: Inbound Funnel & Routing (Hub & Security)
+How organic traffic searches, applies, and gets routed.
+
+The Explainer Hub Template: * Status: COMPLETE. page-marketplace-hub.php contains the Stoner search and the Maker intake form.
+
+The Intake Action (JS): * Status: COMPLETE. Front-end script hits the axx_market_submit_intake endpoint.
+
+The Intake Webhook (PHP): * Status: MISSING. The backend handler to catch the form, create the Maker, set status to Onboarding, generate the token, and leave onboard_sent_date blank does not exist in class-axxanoid-marketplace-public.php.
+
+The Router & Security Gatekeeper: * Status: NEEDS FIX (FATAL ERROR RISK). In class-axxanoid-marketplace-public.php, the load_siloed_templates method attempts to fire a wp_safe_redirect if the user is unauthenticated. Running a redirect inside a template_include hook crashes WordPress (Headers already sent). The redirect logic must be extracted and safely placed inside a template_redirect hook, or baked into the top of the physical template files.
+
+🔴 PHASE 3: The Private Portal (Self-Serve Onboarding)
+Where inbound Makers build their profiles.
+
+The Onboarding Dashboard Template: * Status: MISSING. onboard-single-axx_market_maker.php does not exist.
+
+The Homework Handlers (PHP/JS): * Status: MISSING. Need the frontend forms and AJAX endpoints for the Maker to submit their Bio and Products.
+
+The Product Generator: * Status: MISSING. The PHP logic that catches the Maker's homework, natively generates the external WooCommerce products, assigns the brands, and populates the maker_product_ids string.
+
+The Lock-In Trigger: * Status: MISSING. "Submit for Review" button that flips status to Pending Review.
+
+🔴 PHASE 4: Public Display & The Trap
+What the stoners and the expired makers see.
+
+The Vanity Profile (single-axx_market_maker.php): * Status: COMPLETE. Safely renders the scarcity banners and successfully executes the "Visual Punishment" (hiding the product grid if the status is Expired).
+
+The Reactivation Trap Template: * Status: MISSING. expired-single-axx_market_maker.php does not exist. (Used when an expired maker clicks their token link to pay).
+
+The Directory Search Archive: * Status: MISSING. archive-axx_market_maker.php does not exist.
+
+🔴 PHASE 5: Python APIs & Drone Ops
+The headless connection.
+
+The APIs: * Status: NEEDS MINOR UPDATE. Endpoints for pitches, follow-ups, and expiring trials are complete. We are missing the /pending-onboards endpoint for Python to read the blank onboard_sent_date flag.
+
+Python Scripts: * Status: PENDING PYTHON DEV. (Outside the scope of the WP plugin build).
+
+This is the exact, unhallucinated reality of your plugin. We are fully aligned on the rules.
+
+I recommend we clean up the Phase 1 & Phase 2 Debt before building new templates. Specifically: fixing the fatal redirect crash in the Router, deleting the obsolete taxonomy-mover in the WooCommerce webhook, and writing the Intake Webhook.
+
+.......
+
+Step 1: Fix the Fatal Redirect Error in the Router

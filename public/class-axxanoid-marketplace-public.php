@@ -12,7 +12,7 @@ if ( ! defined( 'WPINC' ) ) {
 class Axxanoid_Marketplace_Public {
     public function __construct() {
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_public_scripts' ) );
-        add_filter( 'template_redirect', array( $this, 'enforce_private_maker_profiles' ) );
+        add_action( 'template_redirect', array( $this, 'enforce_private_maker_profiles' ) );
         add_filter( 'template_include', array( $this, 'load_siloed_templates' ) );
     }
 
@@ -66,7 +66,6 @@ class Axxanoid_Marketplace_Public {
      * Intercepts the WordPress template hierarchy and forces our plugin templates.
      */
     public function load_siloed_templates( $template ) {
-
         $options = get_option( 'axxanoid_marketplace_settings', array() );
         $base_slug = isset( $options['maker_base_slug'] ) ? $options['maker_base_slug'] : 'marketplace/makers';
         $parts = explode( '/', trim( $base_slug, '/' ) );
@@ -136,5 +135,30 @@ class Axxanoid_Marketplace_Public {
 
         // Fallback to the default theme template if ours are missing
         return $template;
+    }
+
+    public function enforce_private_maker_profiles() {
+        if ( ! is_singular( 'axx_market_maker' ) ) {
+            return;
+        }
+
+        $maker_id = get_the_ID();
+        $status   = get_post_meta( $maker_id, 'marketplace_status', true ) ?: 'Trial';
+        
+        if ( in_array( $status, array( 'Trial', 'Active', 'Expired' ), true ) ) {
+            return;
+        }
+
+        $provided_token   = isset( $_GET['marketplace_token'] ) ? sanitize_text_field( wp_unslash( $_GET['marketplace_token'] ) ) : '';
+        $saved_token      = get_post_meta( $maker_id, 'marketplace_claim_token', true );
+        $is_authenticated = ( ! empty( $provided_token ) && $provided_token === $saved_token ) || current_user_can( 'manage_options' );
+
+        if ( ! $is_authenticated ) {
+            $options = get_option( 'axxanoid_marketplace_settings', array() );
+            $base_slug = isset( $options['maker_base_slug'] ) ? $options['maker_base_slug'] : 'marketplace/makers';
+            $parts = explode( '/', trim( $base_slug, '/' ) );
+            wp_safe_redirect( home_url( '/' . $parts[0] . '/' ) );
+            exit;
+        }
     }
 }
