@@ -73,50 +73,18 @@ class Axxanoid_Marketplace_Public {
         
         // Intercept the Single Vanity Profile (e.g., /marketplace/makers/joes-glass)
         if ( is_singular( 'axx_market_maker' ) ) {
-            $maker_id = get_the_ID();
-            $status   = get_post_meta( $maker_id, 'marketplace_status', true ) ?: 'Trial';
+            $status = get_post_meta( get_the_ID(), 'marketplace_status', true ) ?: 'Trial';
             
-            // If the profile public (active / trial ), let it load.
-            if ( in_array( $status, array( 'Trial', 'Active' ), true ) ) {
+            if ( in_array( $status, array( 'Onboarding', 'Pending Review' ), true ) ) {
+                $plugin_template = AXX_MARKET_PLUGIN_DIR . 'public/templates/onboard-single-axx_market_maker.php';
+            } elseif ( $status === 'Expired') {
+                $plugin_template = AXX_MARKET_PLUGIN_DIR . 'public/templates/expired-single-axx_market_maker.php';
+            } else {
                 $plugin_template = AXX_MARKET_PLUGIN_DIR . 'public/templates/single-axx_market_maker.php';
-                if ( file_exists( $plugin_template ) ) {
-                    return $plugin_template;
-                }
-            } 
-            // Onboarding, Pending Review, or Expired. Check for token.
-            else {
-                $provided_token   = isset( $_GET['marketplace_token'] ) ? sanitize_text_field( wp_unslash( $_GET['marketplace_token'] ) ) : '';
-                $saved_token      = get_post_meta( $maker_id, 'marketplace_claim_token', true );
-                $is_authenticated = ( ! empty( $provided_token ) && $provided_token === $saved_token ) || current_user_can( 'manage_options' );
-
-                // Profile not public and no token, redirect them to the Hub Page
-                if ( ! $is_authenticated ) {
-                    $options = get_option( 'axxanoid_marketplace_settings', array() );
-                    $base_slug = isset( $options['maker_base_slug'] ) ? $options['maker_base_slug'] : 'marketplace/makers';
-                    $parts = explode( '/', trim( $base_slug, '/' ) );
-                    $hub_slug = $parts[0];
-
-                    wp_safe_redirect( home_url( '/' . $hub_slug . '/' ) );
-                    exit;
-                } 
-                // Profile not public token is provided, load correct template based on status
-                else {
-                    if ( in_array( $status, array( 'Onboarding', 'Pending Review' ), true ) ) {
-                        // TO-DO -- if onboarding inputs to fill template -- if Pending Review show completed template -- create footer to show form inputs -- allow toogle to edit inputs (toggle back to onboarding)
-                        $plugin_template = AXX_MARKET_PLUGIN_DIR . 'public/templates/onboard-single-axx_market_maker.php';
-                        if ( file_exists( $plugin_template ) ) {
-                            return $plugin_template;
-                        }
-                    } elseif ( $status === 'Expired') {
-                        $plugin_template = AXX_MARKET_PLUGIN_DIR . 'public/templates/expired-single-axx_market_maker.php';
-                        if ( file_exists( $plugin_template ) ) {
-                            return $plugin_template;
-                        }
-                    } 
-                }
             }
-        } 
-        
+
+            if ( file_exists( $plugin_template ) ) return $plugin_template;
+        }        
         // Intercept the Search/Directory Archive (e.g., /marketplace/makers/)
         elseif ( is_post_type_archive( 'axx_market_maker' ) ) {
             $plugin_template = AXX_MARKET_PLUGIN_DIR . 'public/templates/archive-axx_market_maker.php';
@@ -124,7 +92,6 @@ class Axxanoid_Marketplace_Public {
                 return $plugin_template;
             }
         }
-
         // Intercept the dynamically generated Explainer Hub
         elseif ( is_page( $hub_slug ) ) {
             $plugin_template = AXX_MARKET_PLUGIN_DIR . 'public/templates/page-marketplace-hub.php';
@@ -145,7 +112,7 @@ class Axxanoid_Marketplace_Public {
         $maker_id = get_the_ID();
         $status   = get_post_meta( $maker_id, 'marketplace_status', true ) ?: 'Trial';
         
-        if ( in_array( $status, array( 'Trial', 'Active', 'Expired' ), true ) ) {
+        if ( in_array( $status, array( 'Trial', 'Active' ), true ) ) {
             return;
         }
 

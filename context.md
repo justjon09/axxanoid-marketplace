@@ -1538,6 +1538,17 @@ This is the exact, unhallucinated reality of your plugin. We are fully aligned o
 
 I recommend we clean up the Phase 1 & Phase 2 Debt before building new templates. Specifically: fixing the fatal redirect crash in the Router, deleting the obsolete taxonomy-mover in the WooCommerce webhook, and writing the Intake Webhook.
 
-.......
+-------
+CASES:
 
-Step 1: Fix the Fatal Redirect Error in the Router
+1) Stoner / Maker- to hub (/marketplace): hits enforce_private_maker_profiles -> ! is_singular( 'axx_market_maker' ) return -> hits load_siloed_templates -> ! is_singular( 'axx_market_maker' )  -> ! is_post_type_archive( 'axx_market_maker' ) -> is_page( $hub_slug ) -> template public/templates/page-marketplace-hub.php
+
+2) Stoner / Maker to archive (/marketplace/makers): hits enforce_private_maker_profiles -> ! is_singular( 'axx_market_maker' ) return -> hits load_siloed_templates -> ! is_singular( 'axx_market_maker' )  -> is_post_type_archive( 'axx_market_maker' ) -> template public/templates/archive-axx_market_maker.php
+
+3) Stoner / Maker to public (active/trial) maker (/marketplace/makers/joes-glass): hits enforce_private_maker_profiles -> is_singular( 'axx_market_maker' ) -> status in_array() retrun -> hits load_siloed_templates -> is_singular( 'axx_market_maker' ) -> status in_array() -> template public/templates/single-axx_market_maker.php
+
+4) Stoner to non-public (expired/onboarding/pending review) maker (/marketplace/makers/joes-glass): hits enforce_private_maker_profiles -> is_singular( 'axx_market_maker' ) -> status ! in_array() -> ! $is_authenticated -> wp_safe_redirect to hub
+
+5) Maker to Expired maker (/marketplace/makers/joes-glass): hits enforce_private_maker_profiles -> is_singular( 'axx_market_maker' ) -> status ! in_array() -> $is_authenticated -> hits load_siloed_templates ->  is_singular( 'axx_market_maker' ) -> status ! in_array() -> $status === 'Expired' -> template public/templates/expired-single-axx_market_maker.php
+
+6) Maker to Onboarding/Pending Review maker (/marketplace/makers/joes-glass): hits enforce_private_maker_profiles -> is_singular( 'axx_market_maker' ) -> status ! in_array() -> $is_authenticated -> hits load_siloed_templates -> is_singular( 'axx_market_maker' ) -> status in_array() -> template public/templates/onboard-single-axx_market_maker.php
