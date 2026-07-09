@@ -1,0 +1,92 @@
+/* Marketplace Hub Page */
+.axx-market-hub-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.axx-hub-section {
+    margin-bottom: 50px;
+}
+.axx-hub-consumer-pitch {
+    text-align: center;
+    padding: 50px 20px;
+    background: #fdf8e2;
+    border-radius: 8px;
+}
+.axx-hub-consumer-pitch h1 {
+    font-size: 2.5em;
+    margin-bottom: 15px;
+}
+.axx-hub-subtitle {
+    font-size: 1.2em;
+    color: #4b5563;
+    max-width: 800px;
+    margin: 0 auto 30px;
+}
+.axx-market-search-form {
+    display: flex;
+    gap: 10px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+.axx-market-search-form input[type="text"] {
+    flex-grow: 1;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.axx-market-search-form button {
+    padding: 12px 24px;
+    font-size: 16px;
+}
+.axx-hub-maker-pitch {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    align-items: flex-start;
+}
+.axx-maker-pitch-content {
+    flex: 1;
+    min-width: 300px;
+}
+.axx-maker-pitch-content ul {
+    list-style: disc;
+    margin-left: 20px;
+    margin-bottom: 20px;
+}
+.axx-maker-intake-form-wrapper {
+    flex: 1;
+    min-width: 300px;
+    background: #fff;
+    padding: 30px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+.axx-maker-intake-form-wrapper h3 {
+    margin-top: 0;
+}
+.axx-form-row {
+    margin-bottom: 15px;
+}
+.axx-form-row label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+.axx-form-row input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+#axx-intake-message {
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+}
+.axx-maker-intake-form-wrapper button[type="submit"] {
+    width: 100%;
+    font-size: 16px;
+    padding: 12px;
+}

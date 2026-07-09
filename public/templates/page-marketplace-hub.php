@@ -10,34 +10,65 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 get_header();
-// TO-DO: consolidate css to asset file 
 ?>
 
 <div class="axx-market-hub-container wrap">
 
-    <section class="axx-hub-section axx-hub-consumer-pitch" style="text-align: center; padding: 40px 20px; background: #fdf8e2; border-radius: 8px; margin-bottom: 40px;">
-        <h1 style="font-size: 2.5em; margin-bottom: 15px;">Support Indie Glass & Gear</h1>
-        <p style="font-size: 1.2em; color: #4b5563; max-width: 800px; margin: 0 auto 30px;">
+    <section class="axx-hub-section axx-hub-consumer-pitch">
+        <h1>Support Indie Glass & Gear</h1>
+        <p class="axx-hub-subtitle">
             The Average Stoner Indie Marketplace is a curated, ever-changing collection of the best underground glassblowers, 3D printers, and accessory makers on the web. <br><br>
             <strong>These aren't mass-produced dropships.</strong> We hunt down real artists and give them a permanent home to showcase their craft. Inventory moves fast, so bookmark this page and check back often!
         </p>
 
-        <div class="axx-hub-search-wrapper" style="max-width: 600px; margin: 0 auto;">
-            <form action="<?php echo esc_url( home_url( '/' ) ); ?>" method="get" class="axx-market-search-form" style="display: flex; gap: 10px;">
+        <div class="axx-hub-search-wrapper">
+            <form action="<?php echo esc_url( home_url( '/' ) ); ?>" method="get" class="axx-market-search-form">
                 <input type="hidden" name="post_type" value="axx_market_maker" />
-                <input type="text" name="s" placeholder="Search for makers, brands, or specific gear..." required style="flex-grow: 1; padding: 10px; font-size: 16px;" />
-                <button type="submit" class="button button-primary" style="padding: 10px 20px; font-size: 16px;">Search the Market</button>
+                <input type="text" name="s" placeholder="Search for makers, brands, or specific gear..." required />
+                <button type="submit" class="button button-primary">Search the Market</button>
             </form>
         </div>
     </section>
 
-    <section class="axx-hub-section axx-hub-indie-finds" style="display: flex; flex-wrap: wrap; gap: 40px; align-items: flex-start;">
-        <?php // TO-DO: carosel of marketplace products (using Indie default (all) brand) ?>
+    <section class="axx-hub-section axx-hub-indie-finds">
+        <h2 style="text-align: center; width: 100%; margin-bottom: 20px;">Latest Indie Finds</h2>
+        <?php 
+        if ( function_exists( 'WC' ) ) {
+            $args = array(
+                'post_type'      => 'product',
+                'posts_per_page' => 4, // Show the 4 newest products
+                'post_status'    => 'publish',
+                'tax_query'      => array(
+                    array(
+                        'taxonomy' => 'product_cat', // Querying the native Woo category
+                        'field'    => 'slug',
+                        'terms'    => 'indie-finds',
+                    ),
+                ),
+            );
+
+            $products_query = new WP_Query( $args );
+
+            if ( $products_query->have_posts() ) {
+                echo '<div class="woocommerce" style="width: 100%;">';
+                echo '<ul class="products columns-4">';
+                while ( $products_query->have_posts() ) {
+                    $products_query->the_post();
+                    wc_get_template_part( 'content', 'product' ); 
+                }
+                echo '</ul>';
+                echo '</div>';
+                wp_reset_postdata();
+            } else {
+                echo '<p style="text-align:center; width:100%;">New drops coming soon...</p>';
+            }
+        }
+        ?>
     </section>
 
-    <section class="axx-hub-section axx-hub-maker-pitch" style="display: flex; flex-wrap: wrap; gap: 40px; align-items: flex-start;">
+    <section class="axx-hub-section axx-hub-maker-pitch">
         
-        <div class="axx-maker-pitch-content" style="flex: 1; min-width: 300px;">
+        <div class="axx-maker-pitch-content">
             <h2>Are You an Indie Maker?</h2>
             <p>We are actively hunting for talented glassblowers, 3D printers, and cannabis accessory creators to feature to our 4,000+ community members.</p>
             <p><strong>Stop fighting the algorithm.</strong> List your top products directly on Average Stoner and let our traffic do the heavy lifting.</p>
@@ -46,35 +77,36 @@ get_header();
                 <li>No credit card required upfront.</li>
                 <li>Keep 100% of your sales (we just link directly to your existing store).</li>
             </ul>
-            <p><em>Note: Due to high volume, please expect a 7-day turnaround for our team to review your application, scrape your provided store, and build your custom portfolio.</em></p>
+            <p><em>Note: Due to high volume, please expect up to a 7-day turnaround for our team to review your application, scrape your provided store, and build your custom portfolio.</em></p>
         </div>
 
-        <div class="axx-maker-intake-form-wrapper" style="flex: 1; min-width: 300px; background: #fff; padding: 30px; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-            <?php // TO-DO replace this form -- secure -- captcha -- tie into wp or axxanoid contact? -- create full CMS for indie marketplace (almost there now)? -- this is bot magnet ?>
-            <h3 style="margin-top:0;">Request a Portfolio Listing</h3>
+        <div class="axx-maker-intake-form-wrapper">
+            <h3>Request a Portfolio Listing</h3>
             
             <form id="axx-market-intake-form">
-                <div style="margin-bottom: 15px;">
-                    <label for="axx_intake_name" style="display: block; font-weight: bold; margin-bottom: 5px;">Maker / Brand Name *</label>
-                    <input type="text" id="axx_intake_name" placeholder="Joe Makes Glass" required style="width: 100%; padding: 8px;" />
+                <input type="text" id="axx_intake_hp" name="axx_intake_hp" style="display:none !important;" tabindex="-1" autocomplete="off" />
+
+                <div class="axx-form-row">
+                    <label for="axx_intake_name">Maker / Brand Name *</label>
+                    <input type="text" id="axx_intake_name" placeholder="Joe Makes Glass" required />
                 </div>
 
-                <div style="margin-bottom: 15px;">
-                    <label for="axx_intake_email" style="display: block; font-weight: bold; margin-bottom: 5px;">Contact Email *</label>
-                    <input type="email" id="axx_intake_email" required style="width: 100%; padding: 8px;" />
+                <div class="axx-form-row">
+                    <label for="axx_intake_email">Contact Email *</label>
+                    <input type="email" id="axx_intake_email" required />
                 </div>
 
-                <div style="margin-bottom: 15px;">
-                    <label for="axx_intake_url" style="display: block; font-weight: bold; margin-bottom: 5px;">Alt / Store URL (Optional but recommended)</label>
-                    <input type="url" id="axx_intake_url" placeholder="https://" style="width: 100%; padding: 8px;" />
+                <div class="axx-form-row">
+                    <label for="axx_intake_url">Alt / Store URL (Optional but recommended)</label>
+                    <input type="url" id="axx_intake_url" placeholder="https://" />
                 </div>
 
-                <div id="axx-intake-message" style="display: none; padding: 10px; margin-bottom: 15px; border-radius: 4px;"></div>
+                <div id="axx-intake-message" style="display: none;"></div>
 
-                <button type="submit" class="button button-primary" style="width: 100%; font-size: 16px; padding: 10px;">Submit Application</button>
+                <button type="submit" class="button button-primary">Request Listing</button>
             </form>
         </div>
     </section>
 
-</div><?php
-get_footer();
+</div>
+<?php get_footer(); ?>
