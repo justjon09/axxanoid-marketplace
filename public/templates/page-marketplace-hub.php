@@ -9,7 +9,8 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-get_header(); 
+get_header();
+// TO-DO: consolidate css to asset file 
 ?>
 
 <div class="axx-market-hub-container wrap">
@@ -30,6 +31,10 @@ get_header();
         </div>
     </section>
 
+    <section class="axx-hub-section axx-hub-indie-finds" style="display: flex; flex-wrap: wrap; gap: 40px; align-items: flex-start;">
+        <?php // TO-DO: carosel of marketplace products (using Indie default (all) brand) ?>
+    </section>
+
     <section class="axx-hub-section axx-hub-maker-pitch" style="display: flex; flex-wrap: wrap; gap: 40px; align-items: flex-start;">
         
         <div class="axx-maker-pitch-content" style="flex: 1; min-width: 300px;">
@@ -45,12 +50,13 @@ get_header();
         </div>
 
         <div class="axx-maker-intake-form-wrapper" style="flex: 1; min-width: 300px; background: #fff; padding: 30px; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-            <h3 style="margin-top:0;">Request a Portfolio</h3>
+            <?php // TO-DO replace this form -- secure -- captcha -- tie into wp or axxanoid contact? -- create full CMS for indie marketplace (almost there now)? -- this is bot magnet ?>
+            <h3 style="margin-top:0;">Request a Portfolio Listing</h3>
             
             <form id="axx-market-intake-form">
                 <div style="margin-bottom: 15px;">
                     <label for="axx_intake_name" style="display: block; font-weight: bold; margin-bottom: 5px;">Maker / Brand Name *</label>
-                    <input type="text" id="axx_intake_name" required style="width: 100%; padding: 8px;" />
+                    <input type="text" id="axx_intake_name" placeholder="Joe Makes Glass" required style="width: 100%; padding: 8px;" />
                 </div>
 
                 <div style="margin-bottom: 15px;">
@@ -59,18 +65,8 @@ get_header();
                 </div>
 
                 <div style="margin-bottom: 15px;">
-                    <label for="axx_intake_url" style="display: block; font-weight: bold; margin-bottom: 5px;">Etsy / Store URL (Optional but recommended)</label>
+                    <label for="axx_intake_url" style="display: block; font-weight: bold; margin-bottom: 5px;">Alt / Store URL (Optional but recommended)</label>
                     <input type="url" id="axx_intake_url" placeholder="https://" style="width: 100%; padding: 8px;" />
-                </div>
-
-                <div style="margin-bottom: 20px;">
-                    <label for="axx_intake_stock" style="display: block; font-weight: bold; margin-bottom: 5px;">Typical Stock Status *</label>
-                    <select id="axx_intake_stock" required style="width: 100%; padding: 8px;">
-                        <option value="">Select an option...</option>
-                        <option value="Made on Demand">Made on Demand</option>
-                        <option value="Limited Drops">Limited Drops / Small Batches</option>
-                        <option value="Always Available">Always Available</option>
-                    </select>
                 </div>
 
                 <div id="axx-intake-message" style="display: none; padding: 10px; margin-bottom: 15px; border-radius: 4px;"></div>

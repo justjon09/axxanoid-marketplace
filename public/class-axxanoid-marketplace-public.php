@@ -62,6 +62,34 @@ class Axxanoid_Marketplace_Public {
         }
     }
 
+    public function enforce_private_maker_profiles() {
+        if ( ! is_singular( 'axx_market_maker' ) ) {
+            return;
+        }
+
+        $maker_id = get_the_ID();
+        $status   = get_post_meta( $maker_id, 'marketplace_status', true ) ?: 'Trial';
+        
+        $provided_token   = isset( $_GET['marketplace_token'] ) ? sanitize_text_field( wp_unslash( $_GET['marketplace_token'] ) ) : '';
+        $saved_token      = get_post_meta( $maker_id, 'marketplace_claim_token', true );
+        $is_authenticated = ( ! empty( $provided_token ) && $provided_token === $saved_token ) || current_user_can( 'manage_options' );
+
+        // Pass the auth state to the template for this specific page load only
+        set_query_var( 'axx_is_maker_auth', $is_authenticated );
+
+        if ( in_array( $status, array( 'Trial', 'Active' ), true ) ) {
+            return;
+        }
+
+        if ( ! $is_authenticated ) {
+            $options = get_option( 'axxanoid_marketplace_settings', array() );
+            $base_slug = isset( $options['maker_base_slug'] ) ? $options['maker_base_slug'] : 'marketplace/makers';
+            $parts = explode( '/', trim( $base_slug, '/' ) );
+            wp_safe_redirect( home_url( '/' . $parts[0] . '/' ) );
+            exit;
+        }
+    }
+
     /**
      * Intercepts the WordPress template hierarchy and forces our plugin templates.
      */
@@ -102,30 +130,5 @@ class Axxanoid_Marketplace_Public {
 
         // Fallback to the default theme template if ours are missing
         return $template;
-    }
-
-    public function enforce_private_maker_profiles() {
-        if ( ! is_singular( 'axx_market_maker' ) ) {
-            return;
-        }
-
-        $maker_id = get_the_ID();
-        $status   = get_post_meta( $maker_id, 'marketplace_status', true ) ?: 'Trial';
-        
-        if ( in_array( $status, array( 'Trial', 'Active' ), true ) ) {
-            return;
-        }
-
-        $provided_token   = isset( $_GET['marketplace_token'] ) ? sanitize_text_field( wp_unslash( $_GET['marketplace_token'] ) ) : '';
-        $saved_token      = get_post_meta( $maker_id, 'marketplace_claim_token', true );
-        $is_authenticated = ( ! empty( $provided_token ) && $provided_token === $saved_token ) || current_user_can( 'manage_options' );
-
-        if ( ! $is_authenticated ) {
-            $options = get_option( 'axxanoid_marketplace_settings', array() );
-            $base_slug = isset( $options['maker_base_slug'] ) ? $options['maker_base_slug'] : 'marketplace/makers';
-            $parts = explode( '/', trim( $base_slug, '/' ) );
-            wp_safe_redirect( home_url( '/' . $parts[0] . '/' ) );
-            exit;
-        }
     }
 }
