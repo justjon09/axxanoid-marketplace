@@ -10,10 +10,14 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 class Axxanoid_Marketplace_Public {
+
     public function __construct() {
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_public_scripts' ) );
         add_action( 'template_redirect', array( $this, 'enforce_private_maker_profiles' ) );
         add_filter( 'template_include', array( $this, 'load_siloed_templates' ) );
+        // Intake Form Handlers
+        add_action( 'wp_ajax_axx_market_submit_intake', array( $this, 'ajax_handle_maker_intake' ) );
+        add_action( 'wp_ajax_nopriv_axx_market_submit_intake', array( $this, 'ajax_handle_maker_intake' ) );
     }
 
     public function enqueue_public_scripts() {
@@ -69,7 +73,7 @@ class Axxanoid_Marketplace_Public {
 
         $maker_id = get_the_ID();
         $status   = get_post_meta( $maker_id, 'marketplace_status', true ) ?: 'Trial';
-        
+
         $provided_token   = isset( $_GET['marketplace_token'] ) ? sanitize_text_field( wp_unslash( $_GET['marketplace_token'] ) ) : '';
         $saved_token      = get_post_meta( $maker_id, 'marketplace_claim_token', true );
         $is_authenticated = ( ! empty( $provided_token ) && $provided_token === $saved_token ) || current_user_can( 'manage_options' );
@@ -130,5 +134,57 @@ class Axxanoid_Marketplace_Public {
 
         // Fallback to the default theme template if ours are missing
         return $template;
+    }
+
+    /**
+     * Catches the inbound Maker application form.
+     */
+    public function ajax_handle_maker_intake() {
+        check_ajax_referer( 'axx_market_public_nonce', 'nonce' );
+
+        $name  = isset( $_POST['maker_name'] ) ? sanitize_text_field( wp_unslash( $_POST['maker_name'] ) ) : '';
+        $email = isset( $_POST['maker_email'] ) ? sanitize_email( wp_unslash( $_POST['maker_email'] ) ) : '';
+        $url   = isset( $_POST['maker_url'] ) ? esc_url_raw( wp_unslash( $_POST['maker_url'] ) ) : '';
+
+        if ( empty( $name ) || empty( $email ) ) {
+            wp_send_json_error( 'Please provide your Maker Name and Email.' );
+        }
+
+        // Prevent duplicate applications
+        $existing = get_posts( array(
+            'post_type'   => 'axx_market_maker',
+            'meta_key'    => 'maker_email',
+            'meta_value'  => $email,
+            'fields'      => 'ids',
+            'post_status' => 'any'
+        ) );
+
+        if ( ! empty( $existing ) ) {
+            wp_send_json_error( 'An application with this email already exists.' );
+        }
+
+        // Create the Maker Profile ('publish' is required so the Token URL resolves through the Gatekeeper)
+        $maker_id = wp_insert_post( array(
+            'post_title'   => $name,
+            'post_status'  => 'publish', 
+            'post_type'    => 'axx_market_maker'
+        ) );
+
+        if ( is_wp_error( $maker_id ) ) {
+            wp_send_json_error( 'System error. Please try again.' );
+        }
+
+        // Map the initial data
+        update_post_meta( $maker_id, 'maker_email', $email );
+        if ( ! empty( $url ) ) update_post_meta( $maker_id, 'maker_url', $url );
+        
+        // Flag for Onboarding & Generate Secure Token
+        update_post_meta( $maker_id, 'marketplace_status', 'Onboarding' );
+        update_post_meta( $maker_id, 'marketplace_claim_token', wp_generate_password( 20, false ) );
+        
+        // Blank date tells Python to send the magic link
+        update_post_meta( $maker_id, 'onboard_sent_date', '' );
+
+        wp_send_json_success( 'Application received! Check your email in a few minutes for your secure setup link.' );
     }
 }

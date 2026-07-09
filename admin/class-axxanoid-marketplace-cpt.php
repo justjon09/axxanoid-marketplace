@@ -95,7 +95,7 @@ class Axxanoid_Marketplace_CPT {
 			'subscription_order_id' => array( 'type' => 'string', 'default' => '' ), // Active order tracking
             'maker_product_ids'     => array( 'type' => 'string', 'default' => '' ), // Comma-separated list of Woo Product IDs
 
-			// Secure Token used by Maker to view 'Onboarding' and/or 'Expired' profiles 
+			// Secure Token used by Maker to view 'Onboarding' and/or 'Expired' profiles or by Maker request 
 			'marketplace_claim_token' => array( 'type' => 'string', 'default' => '' ),
 		);
 
