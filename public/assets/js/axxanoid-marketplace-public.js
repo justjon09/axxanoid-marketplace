@@ -44,6 +44,12 @@
 		// --- Maker Intake Form Submission ---
 		$('#axx-market-intake-form').on('submit', function(e) {
 			e.preventDefault();
+			
+			// HONEYPOT CHECK: If filled, it's a bot. Stop execution silently.
+			if ( $('#axx_intake_hp').val() !== '' ) {
+				return false;
+			}
+
 			var $form = $(this);
 			var $btn  = $form.find('button[type="submit"]');
 			var $msg  = $('#axx-intake-message');
@@ -57,7 +63,6 @@
 				maker_name:  $('#axx_intake_name').val(),
 				maker_email: $('#axx_intake_email').val(),
 				maker_url:   $('#axx_intake_url').val(),
-				maker_stock: $('#axx_intake_stock').val()
 			}).done(function(response) {
 				$msg.show();
 				if (response.success) {
@@ -70,7 +75,7 @@
 				}
 			}).fail(function() {
 				$msg.show().css({'background': '#fee2e2', 'color': '#991b1b', 'border': '1px solid #f87171'}).text('Server error. Please try again.');
-				$btn.text('Submit Application').prop('disabled', false);
+				$btn.text('Request Listing').prop('disabled', false);
 			});
 		});
 

@@ -32,6 +32,35 @@ require_once AXX_MARKET_PLUGIN_DIR . 'admin/assets/css/axxanoid-admin-styles.css
     </div>
 </div>
 
+<?php
+$banner_id = get_post_meta( $post->ID, 'maker_header_banner', true );
+$portrait_id = get_post_meta( $post->ID, 'maker_portrait', true );
+$callout = get_post_meta( $post->ID, 'maker_callout_text', true );
+$awards = get_post_meta( $post->ID, 'maker_awards', true );
+$socials = get_post_meta( $post->ID, 'maker_social_urls', true );
+?>
+<h3>Portfolio Visuals & Content</h3>
+<div class="axx-market-row">
+    <label for="maker_header_banner">Header Banner (Media ID)</label>
+    <input type="number" name="maker_header_banner" id="maker_header_banner" value="<?php echo esc_attr( $banner_id ); ?>" placeholder="e.g. 1234" />
+</div>
+<div class="axx-market-row">
+    <label for="maker_portrait">Portrait/Avatar (Media ID)</label>
+    <input type="number" name="maker_portrait" id="maker_portrait" value="<?php echo esc_attr( $portrait_id ); ?>" placeholder="e.g. 1235" />
+</div>
+<div class="axx-market-row">
+    <label for="maker_callout_text">Callout Quote</label>
+    <textarea name="maker_callout_text" id="maker_callout_text" rows="3" style="width: 60%; max-width: 400px;"><?php echo esc_textarea( $callout ); ?></textarea>
+</div>
+<div class="axx-market-row">
+    <label for="maker_awards">Awards (JSON Array)</label>
+    <textarea name="maker_awards" id="maker_awards" rows="3" style="width: 60%; max-width: 400px; font-family: monospace;" placeholder='[{"title":"1st Place","place":"Glass Vegas","image":""}]'><?php echo esc_textarea( $awards ); ?></textarea>
+</div>
+<div class="axx-market-row">
+    <label for="maker_social_urls">Socials (JSON Object)</label>
+    <textarea name="maker_social_urls" id="maker_social_urls" rows="3" style="width: 60%; max-width: 400px; font-family: monospace;" placeholder='{"instagram":"https://..."}'><?php echo esc_textarea( $socials ); ?></textarea>
+</div>
+
 <h3>Scraped Recon Data</h3>
 <div class="axx-market-row">
     <label for="woo_brand_id">WooCommerce Brand ID</label>

@@ -79,15 +79,24 @@ class Axxanoid_Marketplace_CPT {
 		$meta_fields = array(
 			// Scraped Data
 			'maker_email'         => array( 'type' => 'string', 'default' => '' ),
-			'maker_url'           => array( 'type' => 'string', 'default' => '' ), // Etsy/IG Outbound Link	
+			'maker_url'           => array( 'type' => 'string', 'default' => '' ), // Etsy/IG Outbound Link
+
+			// Portfolio Visuals & Content
+			'maker_header_banner'   => array( 'type' => 'integer', 'default' => 0 ), // WP Media Attachment ID
+			'maker_portrait'        => array( 'type' => 'integer', 'default' => 0 ), // WP Media Attachment ID
+			'maker_callout_text'    => array( 'type' => 'string', 'default' => '' ),
+			'maker_awards'          => array( 'type' => 'string', 'default' => '' ), // JSON String
+			'maker_social_urls'     => array( 'type' => 'string', 'default' => '' ), // JSON String
+
 			// Subscription & Ego Trap Mechanics
-			'marketplace_status'    => array( 'type' => 'string', 'default' => 'Trial' ), // 'Trial', 'Active', 'Expired', 'Pending', 'Onboarding'
-			'trial_expiration_date' => array( 'type' => 'string', 'default' => '' ), // YYYY-MM-DD
-			'paid_expiration_date'  => array( 'type' => 'string', 'default' => '' ), // YYYY-MM-DD
-			'pitch_sent_date'       => array( 'type' => 'string', 'default' => '' ), // YYYY-MM-DD
-			'onboard_sent_date'     => array( 'type' => 'string', 'default' => '' ), // YYYY-MM-DD
-			'followup_sent_date'    => array( 'type' => 'string', 'default' => '' ), // YYYY-MM-DD
-			'renewal_sent_date'     => array( 'type' => 'string', 'default' => '' ), // YYYY-MM-DD
+			'marketplace_status'    	=> array( 'type' => 'string', 'default' => 'Trial' ), // 'Trial', 'Active', 'Expired', 'Pending', 'Onboarding'
+			'trial_expiration_date' 	=> array( 'type' => 'string', 'default' => '' ), // YYYY-MM-DD
+			'paid_expiration_date'  	=> array( 'type' => 'string', 'default' => '' ), // YYYY-MM-DD
+			'pitch_sent_date'       	=> array( 'type' => 'string', 'default' => '' ), // YYYY-MM-DD
+			'onboard_sent_date'     	=> array( 'type' => 'string', 'default' => '' ), // YYYY-MM-DD
+			'followup_sent_date'    	=> array( 'type' => 'string', 'default' => '' ), // YYYY-MM-DD
+			'renewal_sent_date'     	=> array( 'type' => 'string', 'default' => '' ), // YYYY-MM-DD
+			'reset_link_requested_date'	=> array( 'type' => 'string', 'default' => '' ), // YYYY-MM-DD
 			
 			// WooCommerce Links
 			'woo_brand_id' 			=> array( 'type' => 'integer', 'default' => 0 ), // Links CPT to Woo Taxonomy

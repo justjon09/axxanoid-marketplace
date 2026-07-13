@@ -57,6 +57,11 @@ class Axxanoid_Marketplace_Meta_Box {
 			'paid_expiration_date' => 'sanitize_text_field',
 			'maker_email'           => 'sanitize_email',
 			'maker_url'             => 'esc_url_raw',
+			'maker_header_banner'   => 'absint',
+            'maker_portrait'        => 'absint',
+            'maker_callout_text'    => 'sanitize_textarea_field',
+            'maker_awards'          => 'wp_unslash', // JSON string, keep unslashed
+            'maker_social_urls'     => 'wp_unslash', // JSON string, keep unslashed
 			'pitch_sent_date'       => 'sanitize_text_field',
 			'followup_sent_date'    => 'sanitize_text_field',
 			'woo_brand_id'          => 'absint',
