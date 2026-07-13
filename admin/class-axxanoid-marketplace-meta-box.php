@@ -31,16 +31,24 @@ class Axxanoid_Marketplace_Meta_Box {
 		wp_nonce_field( 'axxanoid_maker_save_meta', 'axxanoid_maker_nonce' );
         
         // Fetch all the data to pass to the template
-		$status       = get_post_meta( $post->ID, 'marketplace_status', true ) ?: 'Trial';
-		$exp_date     = get_post_meta( $post->ID, 'trial_expiration_date', true );
-		$sub_date     = get_post_meta( $post->ID, 'paid_expiration_date', true );
-		$email        = get_post_meta( $post->ID, 'maker_email', true );
-		$maker_url    = get_post_meta( $post->ID, 'maker_url', true );
-		$pitch_date   = get_post_meta( $post->ID, 'pitch_sent_date', true );
-		$follow_date  = get_post_meta( $post->ID, 'followup_sent_date', true );
-		$brand_id     = get_post_meta( $post->ID, 'woo_brand_id', true );
-		$product_id   = get_post_meta( $post->ID, 'locked_in_product_id', true );
-		$order_id     = get_post_meta( $post->ID, 'subscription_order_id', true );
+		$maker_email 	= get_post_meta( $post->ID, 'maker_email', true);
+		$maker_url 		= get_post_meta( $post->ID, 'maker_url', true);
+		$status 		= get_post_meta( $post->ID, 'marketplace_status', true);
+		$trial_exp_date = get_post_meta( $post->ID, 'trial_expiration_date', true);
+		$sub_exp_date 	= get_post_meta( $post->ID, 'paid_expiration_date', true);
+		$brand_id 		= get_post_meta( $post->ID, 'woo_brand_id', true);
+		$sub_product_id = get_post_meta( $post->ID, 'locked_in_product_id', true);
+		$sub_order_id 	= get_post_meta( $post->ID, 'subscription_order_id', true);
+		$banner_id 		= get_post_meta( $post->ID, 'maker_header_banner', true );
+		$portrait_id 	= get_post_meta( $post->ID, 'maker_portrait', true );
+		$callout 		= get_post_meta( $post->ID, 'maker_callout_text', true );
+		$awards 		= get_post_meta( $post->ID, 'maker_awards', true );
+		$socials 		= get_post_meta( $post->ID, 'maker_social_urls', true );
+		$pitch_date 	= get_post_meta( $post->ID, 'pitch_sent_date', true );
+		$follow_date 	= get_post_meta( $post->ID, 'followup_sent_date', true );
+		$onboard_date 	= get_post_meta( $post->ID, 'onboard_sent_date', true );
+		$renewal_date 	= get_post_meta( $post->ID, 'renewal_sent_date', true );
+		$reset_date 	= get_post_meta( $post->ID, 'reset_link_requested_date', true );
 
         // Include the template partial
         require AXX_MARKET_PLUGIN_DIR . 'admin/templates/meta-box-maker.php';

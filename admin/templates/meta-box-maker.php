@@ -4,25 +4,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 require_once AXX_MARKET_PLUGIN_DIR . 'admin/assets/css/axxanoid-admin-styles.css';
-
-$maker_email = get_post_meta( $post->ID, 'maker_email', true);
-$maker_url = get_post_meta( $post->ID, 'maker_url', true);
-$status = get_post_meta( $post->ID, 'marketplace_status', true);
-$trial_exp_date = get_post_meta( $post->ID, 'trial_expiration_date', true);
-$sub_exp_date = get_post_meta( $post->ID, 'paid_expiration_date', true);
-$brand_id = get_post_meta( $post->ID, 'woo_brand_id', true);
-$sub_product_id = get_post_meta( $post->ID, 'locked_in_product_id', true);
-$sub_order_id = get_post_meta( $post->ID, 'subscription_order_id', true);
-$banner_id = get_post_meta( $post->ID, 'maker_header_banner', true );
-$portrait_id = get_post_meta( $post->ID, 'maker_portrait', true );
-$callout = get_post_meta( $post->ID, 'maker_callout_text', true );
-$awards = get_post_meta( $post->ID, 'maker_awards', true );
-$socials = get_post_meta( $post->ID, 'maker_social_urls', true );
-$pitch_date = get_post_meta( $post->ID, 'pitch_sent_date', true );
-$follow_date = get_post_meta( $post->ID, 'followup_sent_date', true );
-$onboard_date = get_post_meta( $post->ID, 'onboard_sent_date', true );
-$renewal_date = get_post_meta( $post->ID, 'renewal_sent_date', true );
-$reset_date = get_post_meta( $post->ID, 'reset_link_requested_date', true );
+require_once AXX_MARKET_PLUGIN_DIR . 'admin/assets/js/axxanoid-meta-box.js';
 ?>
 <h3>Internal Use Data</h3>
 <div class="axx-market-meta-group">
@@ -70,24 +52,6 @@ $reset_date = get_post_meta( $post->ID, 'reset_link_requested_date', true );
         <button type="button" class="button axx-trigger-btn" id="axx-admin-trigger-reset" data-maker="<?php echo $post->ID; ?>">Regenerate & Email Link</button>
         <span id="axx-reset-msg" style="margin-left: 10px; color: green; display: none;">Triggered!</span>
     </div>
-    <script>
-        // Admin Trigger for "Lost Key"
-        document.getElementById('axx-admin-trigger-reset').addEventListener('click', function(e) {
-            e.preventDefault();
-            const btn = this;
-            btn.disabled = true;
-            jQuery.post(ajaxurl, {
-                action: 'axx_market_admin_trigger_reset',
-                maker_id: btn.getAttribute('data-maker'),
-                nonce: '<?php echo wp_create_nonce("axx_market_admin_nonce"); ?>'
-            }, function(res) {
-                if(res.success) {
-                    document.getElementById('axx-reset-msg').style.display = 'inline';
-                    setTimeout(() => location.reload(), 1500); // Reload to show blank date
-                }
-            });
-        });
-    </script>
 </div>
 <div class="axx-market-meta-group">
     <h3>Contact Data</h3>
@@ -115,74 +79,50 @@ $reset_date = get_post_meta( $post->ID, 'reset_link_requested_date', true );
         <input type="text" name="subscription_order_id" id="subscription_order_id" value="<?php echo esc_attr( $sub_order_id ); ?>" />
     </div>
 </div>
-
-
-
-
-
-
-
-
-
 <h3>Portfolio Visuals & Content</h3>
-<div class="axx-market-row">
-    <label>Header Banner (Media ID)</label>
-    <input type="number" name="maker_header_banner" class="axx-market-input-large" value="<?php echo esc_attr( $banner_id ); ?>" />
-</div>
-<div class="axx-market-row">
-    <label>Portrait/Avatar (Media ID)</label>
-    <input type="number" name="maker_portrait" class="axx-market-input-large" value="<?php echo esc_attr( $portrait_id ); ?>" />
-</div>
-<div class="axx-market-row">
-    <label>Callout Quote</label>
-    <textarea name="maker_callout_text" rows="3" class="axx-market-input-large"><?php echo esc_textarea( $callout ); ?></textarea>
-</div>
-
-
-
-<h4>Social Links</h4>
-<div class="axx-market-row">
-    <label>Instagram URL</label>
-    <input type="url" name="socials[instagram]" class="axx-market-input-large" value="<?php echo esc_url( $socials['instagram'] ?? '' ); ?>" />
-</div>
-<div class="axx-market-row">
-    <label>Website URL</label>
-    <input type="url" name="socials[website]" class="axx-market-input-large" value="<?php echo esc_url( $socials['website'] ?? '' ); ?>" />
+<div class="axx-market-meta-group">
+    <h3>Templated Inputs</h3>
+    <div class="axx-market-row">
+        <label>Header Banner (Media ID)</label>
+        <input type="number" name="maker_header_banner" class="axx-market-input-large" value="<?php echo esc_attr( $banner_id ); ?>" />
+    </div>
+    <div class="axx-market-row">
+        <label>Portrait/Avatar (Media ID)</label>
+        <input type="number" name="maker_portrait" class="axx-market-input-large" value="<?php echo esc_attr( $portrait_id ); ?>" />
+    </div>
+    <div class="axx-market-row">
+        <label>Callout Quote</label>
+        <textarea name="maker_callout_text" rows="3" class="axx-market-input-large"><?php echo esc_textarea( $callout ); ?></textarea>
+    </div>
 </div>
 
 
 
-<h4>Awards / Accolades</h4>
-<div id="axx-admin-awards-wrapper" style="max-width: 600px; margin-bottom: 15px;">
-    <?php foreach ( $awards as $index => $award ) : ?>
-        <div class="axx-award-row">
-            <input type="text" name="awards[<?php echo $index; ?>][title]" placeholder="Award Title (e.g. Best Glass)" value="<?php echo esc_attr( $award['title'] ?? '' ); ?>" />
-            <input type="text" name="awards[<?php echo $index; ?>][place]" placeholder="Place (e.g. 1st Place)" value="<?php echo esc_attr( $award['place'] ?? '' ); ?>" />
-            <input type="text" name="awards[<?php echo $index; ?>][image]" placeholder="Image URL (Optional)" value="<?php echo esc_attr( $award['image'] ?? '' ); ?>" />
-            <a href="#" class="axx-award-remove">&times; Remove</a>
-        </div>
-    <?php endforeach; ?>
+
+<div class="axx-market-meta-group">
+    <h4>Social Links</h4>
+    <div class="axx-market-row">
+        <label>Instagram URL</label>
+        <input type="url" name="socials[instagram]" class="axx-market-input-large" value="<?php echo esc_url( $socials['instagram'] ?? '' ); ?>" />
+    </div>
+    <div class="axx-market-row">
+        <label>Website URL</label>
+        <input type="url" name="socials[website]" class="axx-market-input-large" value="<?php echo esc_url( $socials['website'] ?? '' ); ?>" />
+    </div>
 </div>
-<button type="button" class="button" id="axx-add-admin-award">Add Award</button>
-<script>
-    document.getElementById('axx-add-admin-award').addEventListener('click', function(e) {
-        e.preventDefault();
-        const wrapper = document.getElementById('axx-admin-awards-wrapper');
-        const index = wrapper.children.length;
-        const row = document.createElement('div');
-        row.className = 'axx-award-row';
-        row.innerHTML = `
-            <input type="text" name="awards[${index}][title]" placeholder="Award Title" />
-            <input type="text" name="awards[${index}][place]" placeholder="Place" />
-            <input type="text" name="awards[${index}][image]" placeholder="Image URL (Optional)" />
-            <a href="#" class="axx-award-remove">&times; Remove</a>
-        `;
-        wrapper.appendChild(row);
-    });
-    document.getElementById('axx-admin-awards-wrapper').addEventListener('click', function(e) {
-        if(e.target.classList.contains('axx-award-remove')) {
-            e.preventDefault();
-            e.target.parentElement.remove();
-        }
-    });
-</script>
+
+
+<div class="axx-market-meta-group">
+    <h4>Awards / Accolades</h4>
+    <div id="axx-admin-awards-wrapper" style="max-width: 600px; margin-bottom: 15px;">
+        <?php foreach ( $awards as $index => $award ) : ?>
+            <div class="axx-award-row">
+                <input type="text" name="awards[<?php echo $index; ?>][title]" placeholder="Award Title (e.g. Best Glass)" value="<?php echo esc_attr( $award['title'] ?? '' ); ?>" />
+                <input type="text" name="awards[<?php echo $index; ?>][place]" placeholder="Place (e.g. 1st Place)" value="<?php echo esc_attr( $award['place'] ?? '' ); ?>" />
+                <input type="text" name="awards[<?php echo $index; ?>][image]" placeholder="Image URL (Optional)" value="<?php echo esc_attr( $award['image'] ?? '' ); ?>" />
+                <a href="#" class="axx-award-remove">&times; Remove</a>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <button type="button" class="button" id="axx-add-admin-award">Add Award</button>
+</div>
