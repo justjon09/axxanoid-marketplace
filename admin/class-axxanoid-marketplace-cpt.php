@@ -101,21 +101,26 @@ class Axxanoid_Marketplace_CPT {
 			// WooCommerce Links
 			'woo_brand_id' 			=> array( 'type' => 'integer', 'default' => 0 ), // Links CPT to Woo Taxonomy
 			'locked_in_product_id'  => array( 'type' => 'string', 'default' => '' ), // Which woo sub they buy
-			'subscription_order_id' => array( 'type' => 'string', 'default' => '' ), // Active order tracking
-            'maker_product_ids'     => array( 'type' => 'string', 'default' => '' ), // Comma-separated list of Woo Product IDs
+			'subscription_order_id' => array( 'type' => 'string', 'default' => '' ), // Active order tracking			
+            'maker_product_ids'     => array( 'type' => 'integer', 'single' => false ), // The Siloed WooCommerce Product Tracker (Multiple Rows)
 
 			// Secure Token used by Maker to view 'Onboarding' and/or 'Expired' profiles or by Maker request 
 			'marketplace_claim_token' => array( 'type' => 'string', 'default' => '' ),
 		);
 
 		foreach ( $meta_fields as $meta_key => $args ) {
-			register_post_meta( 'axx_market_maker', $meta_key, array(
-				'show_in_rest'  => true,
-				'single'        => true,
-				'type'          => $args['type'],
-				'default'       => $args['default'],
-				'auth_callback' => function() { return current_user_can( 'edit_posts' ); }
-			) );
+			$is_single = isset( $args['single'] ) ? $args['single'] : true;
+			$meta_args = array(
+                'show_in_rest'  => true,
+                'single'        => $is_single,
+                'type'          => $args['type'],
+                'auth_callback' => function() { return current_user_can( 'edit_posts' ); }
+            );
+			if ( isset( $args['default'] ) ) {
+                $meta_args['default'] = $args['default'];
+            }
+
+			register_post_meta( 'axx_market_maker', $meta_key, $meta_args );
 		}
 	}
 	

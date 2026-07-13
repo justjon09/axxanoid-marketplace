@@ -189,6 +189,22 @@
     font-size: 14px;
     color: #6b7280;
 }
+/* Empty State */
+.axx-market-empty-state {
+    padding: 40px;
+    text-align: center;
+    background: #f9fafb;
+    border: 1px dashed #e5e7eb;
+    border-radius: 8px;
+    margin-top: 30px;
+}
+.axx-market-empty-state h2 {
+    color: #9ca3af;
+    margin-bottom: 10px;
+}
+.axx-market-empty-state p {
+    color: #6b7280;
+}
 
 @media (max-width: 768px) {
     .axx-maker-content-grid { grid-template-columns: 1fr; }

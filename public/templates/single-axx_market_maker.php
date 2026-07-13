@@ -152,9 +152,9 @@ $socials = $socials_json ? json_decode( $socials_json, true ) : array();
 
     <section class="axx-maker-products">
         <?php if ( $status === 'Expired' ) : ?>
-            <div class="axx-market-empty-state" style="padding: 40px; text-align: center; background: #f9fafb; border: 1px dashed #e5e7eb; border-radius: 8px;">
-                <h2 style="color: #9ca3af; margin-bottom: 10px;">Portfolio Inactive</h2>
-                <p style="color: #6b7280;">Your products have been removed from this directory listing. Please reactivate your rent to restore your public portfolio.</p>
+            <div class="axx-market-empty-state">
+                <h2>Portfolio Inactive</h2>
+                <p>Your products have been removed from this directory listing. Please reactivate your rent to restore your public portfolio.</p>
             </div>
         <?php else :
             echo '<h2>Products from the Maker</h2>';
