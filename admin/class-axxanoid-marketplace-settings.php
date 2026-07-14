@@ -317,4 +317,145 @@ class Axxanoid_Marketplace_Settings {
 		// Automatically flush rewrite rules so the new URL structure works immediately
 		flush_rewrite_rules();
 	}
+
+	/**
+	 * Central registry for supported Social Networks.
+	 * Defines prefixes, placeholders, and default SVG icons.
+	 */
+	public static function get_social_networks() {
+		return array(
+			'instagram' => array(
+				'label' 	  => 'Instagram', 
+				'prefix'	  => 'https://instagram.com/',
+				'suffix'	  => '',
+				'placeholder' => 'username', 
+				'icon' 		  => 'instagram_svg'
+			),
+			'tiktok' => array( 
+				'label' 	  => 'TikTok', 
+				'prefix' 	  => 'https://tiktok.com/@',
+				'suffix'	  => '',
+				'placeholder' => 'username', 
+				'icon' 		  => 'tiktok_svg'
+			),
+			'etsy' => array(
+				'label' 	  => 'Etsy', 
+				'prefix' 	  => 'https://etsy.com/shop/',
+				'suffix'	  => '',
+				'placeholder' => 'shopname', 
+				'icon' 	 	  => 'etsy_svg'
+			),
+			'pinterest' => array(
+				'label' 	  => 'Pinterest', 
+				'prefix' 	  => 'https://pinterest.com/',
+				'suffix'	  => '',
+				'placeholder' => 'username', 
+				'icon' 		  => 'pinterest_svg'
+			),
+			'facebook' => array(
+				'label' 	  => 'Facebook / Meta', 
+				'prefix' 	  => 'https://facebook.com/',
+				'suffix'	  => '',
+				'placeholder' => 'username', 
+				'icon' 		  => 'meta_svg'
+			),
+			'reddit' => array(
+				'label' 	  => 'Reddit', 
+				'prefix' 	  => 'https://reddit.com/user/',
+				'suffix'	  => '',
+				'placeholder' => 'username', 
+				'icon' 		  => 'reddit_svg'
+			),
+			'x' => array(
+				'label' 	  => 'X (Twitter)',
+				'prefix' 	  => 'https://x.com/',
+				'suffix'	  => '',
+				'placeholder' => 'username',
+				'icon' 		  => 'x_svg'
+			),
+			'whatsapp' => array(
+				'label' 	  => 'WhatsApp',
+				'prefix' 	  => 'https://wa.me/',
+				'suffix'	  => '',
+				'placeholder' => '15551234567',
+				'icon' 		  => 'whatsapp_svg'
+			),
+			'discord' => array(
+				'label' 	  => 'Discord',
+				'prefix' 	  => 'https://discord.gg/',
+				'suffix'	  => '',
+				'placeholder' => 'invitecode',
+				'icon' 		  => 'discord_svg'
+			),
+			'twitch' => array(
+				'label' 	  => 'Twitch',
+				'prefix' 	  => 'https://twitch.tv/',
+				'suffix'	  => '',
+				'placeholder' => 'username',
+				'icon' 		  => 'twitch_svg'
+			),
+			'snapchat' => array(
+				'label' 	  => 'Snapchat',
+				'prefix' 	  => 'https://snapchat.com/add/',
+				'suffix'	  => '',
+				'placeholder' => 'username',
+				'icon' 		  => 'snapchat_svg'
+			),
+			'threads' => array(
+				'label' 	  => 'Threads',
+				'prefix' 	  => 'https://threads.net/@',
+				'suffix'	  => '',
+				'placeholder' => 'username',
+				'icon' 		  => 'threads_svg'
+			),
+			'tumblr' => array(
+				'label' 	  => 'Tumblr',
+				'prefix' 	  => 'https://',
+				'placeholder' => 'username',
+				'suffix'	  => '.tumblr.com',
+				'icon' => 'tumblr_svg'
+			),
+			'glasspass' => array(
+				'label' 	  => 'GlassPass',
+				'prefix' 	  => 'glasspass.com/profile/', 
+				'suffix'	  => '',
+				'placeholder' => 'username',
+				'icon' => 'glasspass_svg'
+			),
+			'cannabuzz' => array(
+				'label' 	  => 'CannaBuzz',
+				'prefix' 	  => 'cannabuzz.app/users/',
+				'suffix'	  => '',
+				'placeholder' => 'username',
+				'icon' => 'cannabuzz_svg' ),
+			'weedlife' => array(
+				'label' 	  => 'WeedLife',
+				'prefix' 	  => 'weedlife.com/',
+				'suffix'	  => '',
+				'placeholder' => 'username',
+				'icon' 		  => 'weedlife_svg'
+			),
+			'highthere' => array(
+				'label' 	  => 'High There!',
+				'prefix' 	  => 'highthere.com/',
+				'suffix'	  => '',
+				'placeholder' => 'username',
+				'icon' 		  => 'highthere_svg'
+			),
+			'leafwire' => array(
+				'label' 	  => 'Leafwire',
+				'prefix' 	  => 'leafwire.com/profile/',
+				'suffix'	  => '',
+				'placeholder' => 'username',
+				'icon' 		  => 'leafwire_svg'
+			),
+			'website' => array(
+				'label' 	  => 'Other / Website',
+				'prefix' 	  => 'https://',
+				'suffix'	  => '',
+				'placeholder' => 'www.yourwebsite.com',
+				'icon' 		  => 'webother_svg'
+			),
+		);
+	}
 }

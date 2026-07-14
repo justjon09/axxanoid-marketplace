@@ -55,7 +55,7 @@ class Axxanoid_Marketplace_Meta_Box {
 		$onboard_date 	= get_post_meta( $post->ID, 'onboard_sent_date', true );
 		$renewal_date 	= get_post_meta( $post->ID, 'renewal_sent_date', true );
 		$reset_date 	= get_post_meta( $post->ID, 'reset_link_requested_date', true );
-
+		$networks = Axxanoid_Marketplace_Settings::get_social_networks();
         // Include the template partial
         require AXX_MARKET_PLUGIN_DIR . 'admin/templates/meta-box-maker.php';
 	}
@@ -91,12 +91,20 @@ class Axxanoid_Marketplace_Meta_Box {
 			}
 		}
 
-		// Handle JSON Array for Socials
+		// Handle Dynamic Array for Socials
         if ( isset( $_POST['socials'] ) && is_array( $_POST['socials'] ) ) {
-            $clean_socials = array_map( 'sanitize_text_field', $_POST['socials'] );
-            update_post_meta( $post_id, 'maker_social_urls', wp_json_encode( array_filter( $clean_socials ) ) );
+            $clean_socials = array();
+            foreach ( $_POST['socials'] as $social ) {
+                if ( ! empty( $social['platform'] ) && ! empty( $social['handle'] ) ) {
+                    $clean_socials[] = array(
+                        'platform' => sanitize_text_field( $social['platform'] ),
+                        'handle'   => sanitize_text_field( $social['handle'] )
+                    );
+                }
+            }
+            update_post_meta( $post_id, 'maker_social_urls', wp_json_encode( $clean_socials ) );
         } else {
-            update_post_meta( $post_id, 'maker_social_urls', '{}' );
+            update_post_meta( $post_id, 'maker_social_urls', '[]' );
         }
 
 		// Handle JSON Array for Awards

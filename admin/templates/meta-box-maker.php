@@ -8,7 +8,7 @@ require_once AXX_MARKET_PLUGIN_DIR . 'admin/assets/js/axxanoid-meta-box.js';
 ?>
 <h3>Internal Use Data</h3>
 <div class="axx-market-meta-group">
-    <h3>Maker Status</h3>
+    <h4>Maker Status</h4>
     <div class="axx-market-row">
         <label for="marketplace_status">Marketplace Status</label>
         <select name="marketplace_status" id="marketplace_status">
@@ -29,7 +29,7 @@ require_once AXX_MARKET_PLUGIN_DIR . 'admin/assets/js/axxanoid-meta-box.js';
     </div>
 </div>
 <div class="axx-market-meta-group">
-    <h3>Telemetry</h3>
+    <h4>Telemetry</h4>
     <div class="axx-market-row">
         <label for="pitch_sent_date">Day-1 Pitch Sent Date</label>
         <input type="text" name="pitch_sent_date" id="pitch_sent_date" value="<?php echo esc_attr( $pitch_date ); ?>" placeholder="YYYY-MM-DD" />
@@ -54,7 +54,7 @@ require_once AXX_MARKET_PLUGIN_DIR . 'admin/assets/js/axxanoid-meta-box.js';
     </div>
 </div>
 <div class="axx-market-meta-group">
-    <h3>Contact Data</h3>
+    <h4>Contact Data</h4>
     <div class="axx-market-row">
         <label for="maker_email">Maker Email</label>
         <input type="email" name="maker_email" id="maker_email" value="<?php echo esc_attr( $maker_email ); ?>" placeholder="joesglass@gmail.com" />
@@ -65,7 +65,7 @@ require_once AXX_MARKET_PLUGIN_DIR . 'admin/assets/js/axxanoid-meta-box.js';
     </div>
 </div>
 <div class="axx-market-meta-group">
-    <h3>Woocommerce Details</h3>
+    <h4>Woocommerce Details</h4>
     <div class="axx-market-row">
         <label for="woo_brand_id">WooCommerce Brand ID</label>
         <input type="number" name="woo_brand_id" id="woo_brand_id" value="<?php echo esc_attr( $brand_id ); ?>" />
@@ -81,7 +81,7 @@ require_once AXX_MARKET_PLUGIN_DIR . 'admin/assets/js/axxanoid-meta-box.js';
 </div>
 <h3>Portfolio Visuals & Content</h3>
 <div class="axx-market-meta-group">
-    <h3>Templated Inputs</h3>
+    <h4>Templated Inputs</h4>
     <div class="axx-market-row">
         <label>Header Banner (Media ID)</label>
         <input type="number" name="maker_header_banner" class="axx-market-input-large" value="<?php echo esc_attr( $banner_id ); ?>" />
@@ -99,44 +99,37 @@ require_once AXX_MARKET_PLUGIN_DIR . 'admin/assets/js/axxanoid-meta-box.js';
         <textarea name="maker_bio" rows="5" class="axx-market-input-large"><?php echo esc_textarea( $bio ); ?></textarea>
     </div>
 </div>
-
-
-
-
 <div class="axx-market-meta-group">
     <h4>Public Contact & Social Handles</h4>
     <div class="axx-market-row">
         <label>Public Display Email</label>
-        <input type="email" name="maker_display_email" class="axx-market-input-large" value="<?php echo esc_attr( $display_email ); ?>" placeholder="joe@joesglass.com" />
+        <input type="email" name="maker_display_email" class="axx-market-input-large" value="<?php echo esc_attr( $display_email ); ?>" placeholder="public@shop.com" />
     </div>
-    <div class="axx-market-row">
-        <label>Instagram</label>
-        <div class="axx-social-input-group">
-            <span class="axx-social-addon">@</span>
-            <input type="text" name="socials[instagram]" value="<?php echo esc_attr( $socials['instagram'] ?? '' ); ?>" />
-        </div>
+    <div id="axx-admin-socials-wrapper" class="axx-admin-repeater-wrapper">
+        <?php foreach ( $socials as $index => $social ) : ?>
+            <div class="axx-social-row" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
+                <select name="socials[<?php echo $index; ?>][platform]" class="axx-social-select">
+                    <option value="">Select Platform...</option>
+                    <?php foreach ( $networks as $key => $data ) : ?>
+                        <option value="<?php echo esc_attr($key); ?>" <?php selected( $social['platform'] ?? '', $key ); ?>>
+                            <?php echo esc_html( $data['label'] ); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <div class="axx-social-input-group" style="flex:1;">
+                    <?php $prefix = isset($social['platform']) && isset($networks[$social['platform']]) ? $networks[$social['platform']]['prefix'] : ''; ?>
+                    <span class="axx-social-addon"><?php echo esc_html($prefix); ?></span>
+                    <input type="text" name="socials[<?php echo $index; ?>][handle]" value="<?php echo esc_attr( $social['handle'] ?? '' ); ?>" />
+                </div>
+                <a href="#" class="axx-social-remove">&times; Remove</a>
+            </div>
+        <?php endforeach; ?>
     </div>
-    <div class="axx-market-row">
-        <label>TikTok</label>
-        <div class="axx-social-input-group">
-            <span class="axx-social-addon">@</span>
-            <input type="text" name="socials[tiktok]" value="<?php echo esc_attr( $socials['tiktok'] ?? '' ); ?>" />
-        </div>
-    </div>
-    <div class="axx-market-row">
-        <label>X / Twitter</label>
-        <div class="axx-social-input-group">
-            <span class="axx-social-addon">@</span>
-            <input type="text" name="socials[twitter]" value="<?php echo esc_attr( $socials['twitter'] ?? '' ); ?>" />
-        </div>
-    </div>
-    <div class="axx-market-row">
-        <label>Other/Website (Full URL)</label>
-        <input type="url" name="socials[other]" class="axx-market-input-large" value="<?php echo esc_url( $socials['other'] ?? '' ); ?>" placeholder="https://..." />
-    </div>
+    <button type="button" class="button" id="axx-add-admin-social">Add Social Link</button>
 </div>
-
-
+<script>
+    window.axxSocialNetworks = <?php echo wp_json_encode( $networks ); ?>;
+</script>
 <div class="axx-market-meta-group">
     <h4>Awards / Accolades</h4>
     <div id="axx-admin-awards-wrapper" class="axx-admin-repeater-wrapper">
