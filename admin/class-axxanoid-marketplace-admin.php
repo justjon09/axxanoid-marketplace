@@ -17,7 +17,7 @@ class Axxanoid_Marketplace_Admin {
 		add_action( 'admin_menu', array( $this, 'add_admin_page' ) );
         add_action( 'admin_head', array( $this, 'set_admin_menu_highlight' ) );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
-		// Action hooks for form saves will go here
+		add_action( 'wp_ajax_axx_market_admin_trigger_reset', array( $this, 'ajax_admin_trigger_reset' ) );
 
 		// AJAX Hooks for the Vue Mapper
         add_action( 'wp_ajax_axx_market_save_mappings', array( $this, 'ajax_save_mappings' ) );
@@ -202,5 +202,19 @@ class Axxanoid_Marketplace_Admin {
         // add the loop here to query all 'external' products and update their categories.
         
         wp_send_json_success( 'Retroactive sync complete. (Loop logic pending Woo integration)' );
+    }
+
+	public function ajax_admin_trigger_reset() {
+        check_ajax_referer( self::NONCE_ACTION, 'nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error();
+
+        $maker_id = isset( $_POST['maker_id'] ) ? absint( $_POST['maker_id'] ) : 0;
+        if ( ! $maker_id ) wp_send_json_error();
+
+        // Overwrite token and clear the reset date so Python sends the email
+        update_post_meta( $maker_id, 'marketplace_claim_token', wp_generate_password( 20, false ) );
+        update_post_meta( $maker_id, 'reset_link_requested_date', '' );
+
+        wp_send_json_success();
     }
 }

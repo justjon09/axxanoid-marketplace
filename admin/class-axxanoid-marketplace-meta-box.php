@@ -33,6 +33,7 @@ class Axxanoid_Marketplace_Meta_Box {
         // Fetch all the data to pass to the template
 		$maker_email 	= get_post_meta( $post->ID, 'maker_email', true);
 		$maker_url 		= get_post_meta( $post->ID, 'maker_url', true);
+		$display_email  = get_post_meta( $post->ID, 'maker_display_email', true);
 		$status 		= get_post_meta( $post->ID, 'marketplace_status', true);
 		$trial_exp_date = get_post_meta( $post->ID, 'trial_expiration_date', true);
 		$sub_exp_date 	= get_post_meta( $post->ID, 'paid_expiration_date', true);
@@ -42,8 +43,13 @@ class Axxanoid_Marketplace_Meta_Box {
 		$banner_id 		= get_post_meta( $post->ID, 'maker_header_banner', true );
 		$portrait_id 	= get_post_meta( $post->ID, 'maker_portrait', true );
 		$callout 		= get_post_meta( $post->ID, 'maker_callout_text', true );
-		$awards 		= get_post_meta( $post->ID, 'maker_awards', true );
-		$socials 		= get_post_meta( $post->ID, 'maker_social_urls', true );
+		$bio            = get_post_meta( $post->ID, 'maker_bio', true );
+		$awards_json    = get_post_meta( $post->ID, 'maker_awards', true );
+		$awards         = ! empty( $awards_json ) ? json_decode( $awards_json, true ) : array();
+		if ( ! is_array( $awards ) ) $awards = array();
+		$socials_json   = get_post_meta( $post->ID, 'maker_social_urls', true );
+		$socials        = ! empty( $socials_json ) ? json_decode( $socials_json, true ) : array();
+		if ( ! is_array( $socials ) ) $socials = array();
 		$pitch_date 	= get_post_meta( $post->ID, 'pitch_sent_date', true );
 		$follow_date 	= get_post_meta( $post->ID, 'followup_sent_date', true );
 		$onboard_date 	= get_post_meta( $post->ID, 'onboard_sent_date', true );
@@ -62,12 +68,14 @@ class Axxanoid_Marketplace_Meta_Box {
 		$fields = array(
 			'marketplace_status'    => 'sanitize_text_field',
 			'trial_expiration_date' => 'sanitize_text_field',
-			'paid_expiration_date' => 'sanitize_text_field',
+			'paid_expiration_date'  => 'sanitize_text_field',
 			'maker_email'           => 'sanitize_email',
+			'maker_display_email'   => 'sanitize_email',
 			'maker_url'             => 'esc_url_raw',
 			'maker_header_banner'   => 'absint',
             'maker_portrait'        => 'absint',
             'maker_callout_text'    => 'sanitize_textarea_field',
+			'maker_bio'             => 'wp_kses_post',
             'maker_awards'          => 'wp_unslash', // JSON string, keep unslashed
             'maker_social_urls'     => 'wp_unslash', // JSON string, keep unslashed
 			'pitch_sent_date'       => 'sanitize_text_field',
@@ -82,5 +90,30 @@ class Axxanoid_Marketplace_Meta_Box {
 				update_post_meta( $post_id, $field, call_user_func( $sanitizer, wp_unslash( $_POST[ $field ] ) ) );
 			}
 		}
+
+		// Handle JSON Array for Socials
+        if ( isset( $_POST['socials'] ) && is_array( $_POST['socials'] ) ) {
+            $clean_socials = array_map( 'sanitize_text_field', $_POST['socials'] );
+            update_post_meta( $post_id, 'maker_social_urls', wp_json_encode( array_filter( $clean_socials ) ) );
+        } else {
+            update_post_meta( $post_id, 'maker_social_urls', '{}' );
+        }
+
+		// Handle JSON Array for Awards
+        if ( isset( $_POST['awards'] ) && is_array( $_POST['awards'] ) ) {
+            $clean_awards = array();
+            foreach ( $_POST['awards'] as $award ) {
+                if ( ! empty( $award['title'] ) ) {
+                    $clean_awards[] = array(
+                        'title' => sanitize_text_field( $award['title'] ),
+                        'place' => sanitize_text_field( $award['place'] ),
+                        'image' => esc_url_raw( $award['image'] )
+                    );
+                }
+            }
+            update_post_meta( $post_id, 'maker_awards', wp_json_encode( $clean_awards ) );
+        } else {
+            update_post_meta( $post_id, 'maker_awards', '[]' );
+        }
 	}
 }

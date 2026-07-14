@@ -81,7 +81,7 @@ $socials = $socials_json ? json_decode( $socials_json, true ) : array();
         <?php if ( $banner_url ) : ?>
             <img src="<?php echo esc_url( $banner_url ); ?>" class="axx-maker-banner" alt="Maker Banner" />
         <?php else : ?>
-            <div class="axx-maker-banner-placeholder"></div>
+            <img src="<?php echo esc_url( AXX_MARKET_PLUGIN_URL . 'public/assets/images/default-banner.svg' ); ?>" class="axx-maker-banner" />
         <?php endif; ?>
 
         <div class="axx-maker-portrait-wrap">

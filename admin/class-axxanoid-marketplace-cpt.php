@@ -85,6 +85,8 @@ class Axxanoid_Marketplace_CPT {
 			'maker_header_banner'   => array( 'type' => 'integer', 'default' => 0 ), // WP Media Attachment ID
 			'maker_portrait'        => array( 'type' => 'integer', 'default' => 0 ), // WP Media Attachment ID
 			'maker_callout_text'    => array( 'type' => 'string', 'default' => '' ),
+			'maker_bio'             => array( 'type' => 'string', 'default' => '' ), // Siloed Bio text
+			'maker_display_email'   => array( 'type' => 'string', 'default' => '' ), // Public facing email
 			'maker_awards'          => array( 'type' => 'string', 'default' => '' ), // JSON String
 			'maker_social_urls'     => array( 'type' => 'string', 'default' => '' ), // JSON String
 

@@ -34,3 +34,27 @@
 .axx-award-row input { flex: 1; }
 .axx-award-remove { color: #d63638; cursor: pointer; text-decoration: none; font-weight: bold; }
 .axx-trigger-btn { margin-left: 10px !important; }
+
+.axx-admin-repeater-wrapper {
+    max-width: 600px;
+    margin-bottom: 15px;
+}
+.axx-social-input-group {
+    display: flex;
+    align-items: center;
+    max-width: 400px;
+    width: 60%;
+}
+.axx-social-addon {
+    background: #f0f0f1;
+    padding: 3px 8px;
+    border: 1px solid #8c8f94;
+    border-right: none;
+    border-radius: 3px 0 0 3px;
+    color: #50575e;
+}
+.axx-social-input-group input {
+    border-radius: 0 3px 3px 0;
+    flex-grow: 1;
+    width: auto;
+}

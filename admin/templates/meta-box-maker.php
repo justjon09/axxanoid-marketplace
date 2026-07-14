@@ -57,7 +57,7 @@ require_once AXX_MARKET_PLUGIN_DIR . 'admin/assets/js/axxanoid-meta-box.js';
     <h3>Contact Data</h3>
     <div class="axx-market-row">
         <label for="maker_email">Maker Email</label>
-        <input type="email" name="maker_email" id="maker_email" value="<?php echo esc_attr( $maker_email ); ?>" placeholder="joe@joesglass.com" />
+        <input type="email" name="maker_email" id="maker_email" value="<?php echo esc_attr( $maker_email ); ?>" placeholder="joesglass@gmail.com" />
     </div>
     <div class="axx-market-row">
         <label for="maker_url">URL</label>
@@ -94,27 +94,52 @@ require_once AXX_MARKET_PLUGIN_DIR . 'admin/assets/js/axxanoid-meta-box.js';
         <label>Callout Quote</label>
         <textarea name="maker_callout_text" rows="3" class="axx-market-input-large"><?php echo esc_textarea( $callout ); ?></textarea>
     </div>
+    <div class="axx-market-row">
+        <label>Maker Bio</label>
+        <textarea name="maker_bio" rows="5" class="axx-market-input-large"><?php echo esc_textarea( $bio ); ?></textarea>
+    </div>
 </div>
 
 
 
 
 <div class="axx-market-meta-group">
-    <h4>Social Links</h4>
+    <h4>Public Contact & Social Handles</h4>
     <div class="axx-market-row">
-        <label>Instagram URL</label>
-        <input type="url" name="socials[instagram]" class="axx-market-input-large" value="<?php echo esc_url( $socials['instagram'] ?? '' ); ?>" />
+        <label>Public Display Email</label>
+        <input type="email" name="maker_display_email" class="axx-market-input-large" value="<?php echo esc_attr( $display_email ); ?>" placeholder="joe@joesglass.com" />
     </div>
     <div class="axx-market-row">
-        <label>Website URL</label>
-        <input type="url" name="socials[website]" class="axx-market-input-large" value="<?php echo esc_url( $socials['website'] ?? '' ); ?>" />
+        <label>Instagram</label>
+        <div class="axx-social-input-group">
+            <span class="axx-social-addon">@</span>
+            <input type="text" name="socials[instagram]" value="<?php echo esc_attr( $socials['instagram'] ?? '' ); ?>" />
+        </div>
+    </div>
+    <div class="axx-market-row">
+        <label>TikTok</label>
+        <div class="axx-social-input-group">
+            <span class="axx-social-addon">@</span>
+            <input type="text" name="socials[tiktok]" value="<?php echo esc_attr( $socials['tiktok'] ?? '' ); ?>" />
+        </div>
+    </div>
+    <div class="axx-market-row">
+        <label>X / Twitter</label>
+        <div class="axx-social-input-group">
+            <span class="axx-social-addon">@</span>
+            <input type="text" name="socials[twitter]" value="<?php echo esc_attr( $socials['twitter'] ?? '' ); ?>" />
+        </div>
+    </div>
+    <div class="axx-market-row">
+        <label>Other/Website (Full URL)</label>
+        <input type="url" name="socials[other]" class="axx-market-input-large" value="<?php echo esc_url( $socials['other'] ?? '' ); ?>" placeholder="https://..." />
     </div>
 </div>
 
 
 <div class="axx-market-meta-group">
     <h4>Awards / Accolades</h4>
-    <div id="axx-admin-awards-wrapper" style="max-width: 600px; margin-bottom: 15px;">
+    <div id="axx-admin-awards-wrapper" class="axx-admin-repeater-wrapper">
         <?php foreach ( $awards as $index => $award ) : ?>
             <div class="axx-award-row">
                 <input type="text" name="awards[<?php echo $index; ?>][title]" placeholder="Award Title (e.g. Best Glass)" value="<?php echo esc_attr( $award['title'] ?? '' ); ?>" />
