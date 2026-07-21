@@ -116,20 +116,13 @@ require_once AXX_MARKET_PLUGIN_DIR . 'admin/assets/js/axxanoid-meta-box.js';
                         </option>
                     <?php endforeach; ?>
                 </select>
-                <div class="axx-social-input-group" style="flex:1;">
-                    <?php $prefix = isset($social['platform']) && isset($networks[$social['platform']]) ? $networks[$social['platform']]['prefix'] : ''; ?>
-                    <span class="axx-social-addon"><?php echo esc_html($prefix); ?></span>
-                    <input type="text" name="socials[<?php echo $index; ?>][handle]" value="<?php echo esc_attr( $social['handle'] ?? '' ); ?>" />
-                </div>
+                <input type="text" name="socials[<?php echo $index; ?>][handle]" value="<?php echo esc_attr( $social['handle'] ?? '' ); ?>" placeholder="Handle or URL" style="flex:1;" />
                 <a href="#" class="axx-social-remove">&times; Remove</a>
             </div>
         <?php endforeach; ?>
     </div>
     <button type="button" class="button" id="axx-add-admin-social">Add Social Link</button>
 </div>
-<script>
-    window.axxSocialNetworks = <?php echo wp_json_encode( $networks ); ?>;
-</script>
 <div class="axx-market-meta-group">
     <h4>Awards / Accolades</h4>
     <div id="axx-admin-awards-wrapper" class="axx-admin-repeater-wrapper">

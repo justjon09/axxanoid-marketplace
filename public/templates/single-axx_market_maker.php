@@ -95,15 +95,31 @@ $socials = $socials_json ? json_decode( $socials_json, true ) : array();
         <div class="axx-maker-info-bar">
             <h1 class="axx-maker-title" style="margin: 0; font-size: 2em;"><?php the_title(); ?></h1>
             
-            <div class="axx-maker-socials">
+            <div class="axx-maker-socials" style="display:flex; align-items:center; gap:15px;">
                 <?php 
+                // Load the raw SVGs and the network definitions
+                require_once AXX_MARKET_PLUGIN_DIR . 'public/assets/images/social-svgs.php';
+                $networks_def = Axxanoid_Marketplace_Settings::get_social_networks();
+
                 if ( ! empty( $socials ) && is_array( $socials ) ) {
-                    foreach ( $socials as $platform => $url ) {
-                        if ( ! empty( $url ) ) {
-                            echo '<a href="' . esc_url( $url ) . '" target="_blank" rel="nofollow">' . esc_html( ucfirst( $platform ) ) . '</a>';
+                    foreach ( $socials as $social ) {
+                        $platform = $social['platform'] ?? '';
+                        $handle   = $social['handle'] ?? '';
+                        
+                        if ( $platform && $handle && isset( $networks_def[$platform] ) ) {
+                            $def = $networks_def[$platform];
+                            // Assemble the full outbound link
+                            $url = $def['prefix'] . ltrim($handle, '@/') . $def['suffix']; 
+                            
+                            // Map to the SVG variable from social-svgs.php
+                            $icon_var = $def['icon'];
+                            $svg = isset($$icon_var) ? $$icon_var : '';
+
+                            echo '<a href="' . esc_url( $url ) . '" target="_blank" rel="nofollow" title="' . esc_attr( $def['label'] ) . '" style="display:inline-block; width:24px; height:24px; color:#4b5563;">' . $svg . '</a>';
                         }
                     }
                 }
+                
                 $maker_url = get_post_meta( $maker_id, 'maker_url', true );
                 if ( $maker_url ) {
                     echo '<a href="' . esc_url( $maker_url ) . '" class="button button-primary" target="_blank" rel="nofollow">Official Store &rarr;</a>';
@@ -115,15 +131,18 @@ $socials = $socials_json ? json_decode( $socials_json, true ) : array();
 
     <div class="axx-maker-content-grid">
         <div class="axx-maker-main-bio">
-            <?php if ( $callout ) : ?>
-                <blockquote class="axx-maker-callout">
+            <?php 
+            $bio = get_post_meta( $maker_id, 'maker_bio', true );
+            if ( $callout ) : ?>
+                <blockquote class="axx-maker-callout" style="float: right; width: 40%; min-width: 250px; margin: 0 0 20px 20px;">
                     "<?php echo esc_html( $callout ); ?>"
                 </blockquote>
             <?php endif; ?>
             
             <div class="axx-maker-bio-text">
-                <?php the_content(); ?>
+                <?php echo wp_kses_post( wpautop( $bio ) ); ?>
             </div>
+            <div style="clear:both;"></div>
         </div>
 
         <div class="axx-maker-sidebar">

@@ -77,6 +77,21 @@ class Axxanoid_Marketplace_Admin {
 	}
 
     public function enqueue_admin_scripts( $hook_suffix ) {
+		// Only enqueue the Meta Box JS on the actual Maker CPT edit screen
+        $screen = get_current_screen();
+        if ( $screen && $screen->post_type === 'axx_market_maker' ) {
+            wp_enqueue_script( 
+                'axx-meta-box-js', 
+                AXX_MARKET_PLUGIN_URL . 'admin/assets/js/axxanoid-meta-box.js', 
+                array( 'jquery' ), 
+                AXX_MARKET_VERSION, 
+                true 
+            );
+
+            // Pass the Social Networks array from PHP directly into the JS file safely
+            wp_localize_script( 'axx-meta-box-js', 'axxSocialNetworks', Axxanoid_Marketplace_Settings::get_social_networks() );
+        }
+
 		// Only load Vue on our specific admin page
 		if ( strpos( $hook_suffix, self::PAGE_SLUG ) === false ) return;
 
