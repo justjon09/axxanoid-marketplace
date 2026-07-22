@@ -100,8 +100,7 @@ $search_query = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'
                         </div>
                     </div>
                 </article>
-
-            <?php endline; ?>
+                
             <?php endwhile; ?>
         </div>
 

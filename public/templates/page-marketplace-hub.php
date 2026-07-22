@@ -31,7 +31,7 @@ get_header();
     </section>
 
     <section class="axx-hub-section axx-hub-indie-finds">
-        <h2 style="text-align: center; width: 100%; margin-bottom: 20px;">Latest Indie Finds</h2>
+        <h2 class="axx-indie-finds-title">Latest Indie Finds</h2>
         <?php 
         if ( function_exists( 'WC' ) ) {
             $args = array(
@@ -50,7 +50,7 @@ get_header();
             $products_query = new WP_Query( $args );
 
             if ( $products_query->have_posts() ) {
-                echo '<div class="woocommerce" style="width: 100%;">';
+                echo '<div class="woocommerce axx-indie-finds-woo">';
                 echo '<ul class="products columns-4">';
                 while ( $products_query->have_posts() ) {
                     $products_query->the_post();
@@ -60,7 +60,7 @@ get_header();
                 echo '</div>';
                 wp_reset_postdata();
             } else {
-                echo '<p style="text-align:center; width:100%;">New drops coming soon...</p>';
+                echo '<p class="axx-indie-finds-empty">New drops coming soon...</p>';
             }
         }
         ?>
@@ -72,7 +72,7 @@ get_header();
             <h2>Are You an Indie Maker?</h2>
             <p>We are actively hunting for talented glassblowers, 3D printers, and cannabis accessory creators to feature to our 4,000+ community members.</p>
             <p><strong>Stop fighting the algorithm.</strong> List your top products directly on Average Stoner and let our traffic do the heavy lifting.</p>
-            <ul style="list-style: disc; margin-left: 20px; margin-bottom: 20px;">
+            <ul class="axx-maker-pitch-list">
                 <li>Claim your <strong>10-Day Free Trial</strong> immediately.</li>
                 <li>No credit card required upfront.</li>
                 <li>Keep 100% of your sales (we just link directly to your existing store).</li>

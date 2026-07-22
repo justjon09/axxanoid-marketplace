@@ -36,7 +36,6 @@ $socials = $socials_json ? json_decode( $socials_json, true ) : array();
         <?php 
         $exp_date  = get_post_meta( $maker_id, 'trial_expiration_date', true );
         $days_left = max( 0, floor( ( strtotime( $exp_date ) - time() ) / DAY_IN_SECONDS ) );
-        $days_left = ( strtotime( $exp_date ) - time() ) / DAY_IN_SECONDS;
         ?>
         <div class="axx-market-banner axx-banner-warning">
             <div class="axx-banner-content">

@@ -34,6 +34,8 @@
 .axx-award-row input { flex: 1; }
 .axx-award-remove { color: #d63638; cursor: pointer; text-decoration: none; font-weight: bold; }
 .axx-trigger-btn { margin-left: 10px !important; }
+.axx-social-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+.axx-social-input-flex { flex: 1; }
 
 .axx-admin-repeater-wrapper {
     max-width: 600px;

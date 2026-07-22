@@ -107,7 +107,7 @@ require_once AXX_MARKET_PLUGIN_DIR . 'admin/assets/js/axxanoid-meta-box.js';
     </div>
     <div id="axx-admin-socials-wrapper" class="axx-admin-repeater-wrapper">
         <?php foreach ( $socials as $index => $social ) : ?>
-            <div class="axx-social-row" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
+            <div class="axx-social-row">
                 <select name="socials[<?php echo $index; ?>][platform]" class="axx-social-select">
                     <option value="">Select Platform...</option>
                     <?php foreach ( $networks as $key => $data ) : ?>
@@ -116,7 +116,7 @@ require_once AXX_MARKET_PLUGIN_DIR . 'admin/assets/js/axxanoid-meta-box.js';
                         </option>
                     <?php endforeach; ?>
                 </select>
-                <input type="text" name="socials[<?php echo $index; ?>][handle]" value="<?php echo esc_attr( $social['handle'] ?? '' ); ?>" placeholder="Handle or URL" style="flex:1;" />
+                <input type="text" name="socials[<?php echo $index; ?>][handle]" value="<?php echo esc_attr( $social['handle'] ?? '' ); ?>" placeholder="Handle or URL" class="axx-social-input-flex" />
                 <a href="#" class="axx-social-remove">&times; Remove</a>
             </div>
         <?php endforeach; ?>

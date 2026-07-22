@@ -46,7 +46,6 @@ if (socialWrapper) {
         const index = socialWrapper.children.length;
         const row = document.createElement('div');
         row.className = 'axx-social-row';
-        row.style.cssText = 'display:flex; gap:10px; margin-bottom:10px; align-items:center;';
         
         let optionsHtml = '<option value="">Select Platform...</option>';
         for (const [key, data] of Object.entries(axxSocialNetworks)) {
@@ -57,7 +56,7 @@ if (socialWrapper) {
             <select name="socials[${index}][platform]" class="axx-social-select">
                 ${optionsHtml}
             </select>
-            <input type="text" name="socials[${index}][handle]" placeholder="Handle or URL" style="flex:1;" />
+            <input type="text" name="socials[${index}][handle]" placeholder="Handle or URL" class="axx-social-input-flex" />
             <a href="#" class="axx-social-remove">&times; Remove</a>
         `;
         socialWrapper.appendChild(row);
