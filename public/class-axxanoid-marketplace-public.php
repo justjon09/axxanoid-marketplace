@@ -18,6 +18,18 @@ class Axxanoid_Marketplace_Public {
         // Intake Form Handlers
         add_action( 'wp_ajax_axx_market_submit_intake', array( $this, 'ajax_handle_maker_intake' ) );
         add_action( 'wp_ajax_nopriv_axx_market_submit_intake', array( $this, 'ajax_handle_maker_intake' ) );
+        // Onboarding Form Handlers
+        add_action( 'wp_ajax_axx_market_save_onboard_profile', array( $this, 'ajax_save_onboard_profile' ) );
+        add_action( 'wp_ajax_nopriv_axx_market_save_onboard_profile', array( $this, 'ajax_save_onboard_profile' ) );
+        
+        add_action( 'wp_ajax_axx_market_save_onboard_product', array( $this, 'ajax_save_onboard_product' ) );
+        add_action( 'wp_ajax_nopriv_axx_market_save_onboard_product', array( $this, 'ajax_save_onboard_product' ) );
+        
+        add_action( 'wp_ajax_axx_market_submit_for_review', array( $this, 'ajax_submit_for_review' ) );
+        add_action( 'wp_ajax_nopriv_axx_market_submit_for_review', array( $this, 'ajax_submit_for_review' ) );
+
+        add_action( 'wp_ajax_axx_market_remove_onboard_product', array( $this, 'ajax_remove_onboard_product' ) );
+        add_action( 'wp_ajax_nopriv_axx_market_remove_onboard_product', array( $this, 'ajax_remove_onboard_product' ) );
     }
 
     public function enqueue_public_scripts() {
@@ -186,5 +198,184 @@ class Axxanoid_Marketplace_Public {
         update_post_meta( $maker_id, 'onboard_sent_date', '' );
 
         wp_send_json_success( 'Application received! Check your email in a few minutes for your secure setup link.' );
+    }
+
+    /**
+     * Secures and authenticates incoming Maker AJAX requests.
+     */
+    private function authenticate_maker_ajax() {
+        check_ajax_referer( 'axx_market_public_nonce', 'nonce' );
+        $maker_id = isset( $_POST['maker_id'] ) ? absint( $_POST['maker_id'] ) : 0;
+        if ( ! $maker_id || get_post_type( $maker_id ) !== 'axx_market_maker' ) {
+            wp_send_json_error( 'Invalid Profile.' );
+        }
+        return $maker_id;
+    }
+
+    /**
+     * Saves the Maker's bio, text, JSON repeaters, and securely handles image uploads.
+     */
+    public function ajax_save_onboard_profile() {
+        $maker_id = $this->authenticate_maker_ajax();
+
+        // Save Basic Text Fields
+        if ( isset( $_POST['maker_callout_text'] ) ) update_post_meta( $maker_id, 'maker_callout_text', sanitize_textarea_field( wp_unslash( $_POST['maker_callout_text'] ) ) );
+        if ( isset( $_POST['maker_bio'] ) ) update_post_meta( $maker_id, 'maker_bio', wp_kses_post( wp_unslash( $_POST['maker_bio'] ) ) );
+        if ( isset( $_POST['maker_display_email'] ) ) update_post_meta( $maker_id, 'maker_display_email', sanitize_email( wp_unslash( $_POST['maker_display_email'] ) ) );
+
+        // Handle JSON Array for Socials
+        if ( isset( $_POST['socials'] ) && is_array( $_POST['socials'] ) ) {
+            $clean_socials = array();
+            foreach ( $_POST['socials'] as $social ) {
+                if ( ! empty( $social['platform'] ) && ! empty( $social['handle'] ) ) {
+                    $clean_socials[] = array(
+                        'platform' => sanitize_text_field( $social['platform'] ),
+                        'handle'   => sanitize_text_field( $social['handle'] )
+                    );
+                }
+            }
+            update_post_meta( $maker_id, 'maker_social_urls', wp_json_encode( $clean_socials ) );
+        } else {
+            update_post_meta( $maker_id, 'maker_social_urls', '[]' );
+        }
+
+        // Handle JSON Array for Awards
+        if ( isset( $_POST['awards'] ) && is_array( $_POST['awards'] ) ) {
+            $clean_awards = array();
+            foreach ( $_POST['awards'] as $award ) {
+                if ( ! empty( $award['title'] ) ) {
+                    $clean_awards[] = array(
+                        'title' => sanitize_text_field( $award['title'] ),
+                        'place' => sanitize_text_field( $award['place'] )
+                    );
+                }
+            }
+            update_post_meta( $maker_id, 'maker_awards', wp_json_encode( $clean_awards ) );
+        } else {
+            update_post_meta( $maker_id, 'maker_awards', '[]' );
+        }
+
+        // Native WP Media File Upload Handler
+        require_once( ABSPATH . 'wp-admin/includes/image.php' );
+        require_once( ABSPATH . 'wp-admin/includes/file.php' );
+        require_once( ABSPATH . 'wp-admin/includes/media.php' );
+
+        if ( ! empty( $_FILES['maker_header_banner']['name'] ) ) {
+            $banner_id = media_handle_upload( 'maker_header_banner', $maker_id );
+            if ( ! is_wp_error( $banner_id ) ) {
+                update_post_meta( $maker_id, 'maker_header_banner', $banner_id );
+            }
+        }
+
+        if ( ! empty( $_FILES['maker_portrait']['name'] ) ) {
+            $portrait_id = media_handle_upload( 'maker_portrait', $maker_id );
+            if ( ! is_wp_error( $portrait_id ) ) {
+                update_post_meta( $maker_id, 'maker_portrait', $portrait_id );
+            }
+        }
+
+        wp_send_json_success( 'Saved successfully.' );
+    }
+
+    /**
+     * Accepts a product submission, dynamically creates a WooCommerce External product,
+     * sideloads the image URL, and ties it to the Maker.
+     */
+    public function ajax_save_onboard_product() {
+        $maker_id = $this->authenticate_maker_ajax();
+
+        if ( ! function_exists( 'WC' ) ) wp_send_json_error( 'WooCommerce is not active.' );
+
+        $title = isset( $_POST['product_title'] ) ? sanitize_text_field( wp_unslash( $_POST['product_title'] ) ) : '';
+        $price = isset( $_POST['product_price'] ) ? floatval( $_POST['product_price'] ) : 0;
+        $image_url = isset( $_POST['product_image'] ) ? esc_url_raw( wp_unslash( $_POST['product_image'] ) ) : '';
+        $checkout_url = isset( $_POST['product_url'] ) ? esc_url_raw( wp_unslash( $_POST['product_url'] ) ) : '';
+
+        if ( empty( $title ) || empty( $image_url ) || empty( $checkout_url ) ) {
+            wp_send_json_error( 'Please fill out all required product fields.' );
+        }
+
+        // Create the External Product
+        $product = new WC_Product_External();
+        $product->set_name( $title );
+        $product->set_regular_price( $price );
+        $product->set_product_url( $checkout_url );
+        $product->set_button_text( 'Buy from Maker' );
+        $product->set_status( 'publish' );
+
+        // Tag to parent "Indie Finds" category
+        $term = get_term_by( 'slug', 'indie-finds', 'product_cat' );
+        if ( $term ) {
+            $product->set_category_ids( array( $term->term_id ) );
+        }
+
+        // Tag to Maker's specific Brand ID
+        $brand_id = get_post_meta( $maker_id, 'woo_brand_id', true );
+        if ( $brand_id ) {
+            wp_set_object_terms( $product->get_id(), array( intval( $brand_id ) ), 'brand' );
+        }
+
+        $product_id = $product->save();
+
+        if ( $product_id ) {
+            // Sideload the external image so WooCommerce can use it locally
+            require_once( ABSPATH . 'wp-admin/includes/file.php' );
+            require_once( ABSPATH . 'wp-admin/includes/media.php' );
+            require_once( ABSPATH . 'wp-admin/includes/image.php' );
+            
+            $tmp = download_url( $image_url );
+            if ( ! is_wp_error( $tmp ) ) {
+                $file_array = array(
+                    'name'     => basename( wp_parse_url( $image_url, PHP_URL_PATH ) ),
+                    'tmp_name' => $tmp
+                );
+                $attach_id = media_handle_sideload( $file_array, $product_id );
+                if ( ! is_wp_error( $attach_id ) ) {
+                    set_post_thumbnail( $product_id, $attach_id );
+                } else {
+                    @unlink( $file_array['tmp_name'] );
+                }
+            }
+
+            // Save the child product ID natively to the Maker CPT (Multiple Rows = 'single' => false)
+            add_post_meta( $maker_id, 'maker_product_ids', $product_id, false );
+
+            wp_send_json_success();
+        }
+
+        wp_send_json_error( 'Failed to create product.' );
+    }
+
+    /**
+     * Flips the Maker status to Pending Review and locks the frontend.
+     */
+    public function ajax_submit_for_review() {
+        $maker_id = $this->authenticate_maker_ajax();
+        update_post_meta( $maker_id, 'marketplace_status', 'Pending Review' );
+        wp_send_json_success();
+    }
+
+    /**
+     * Allows Maker to permanently delete a product.
+     */
+    public function ajax_remove_onboard_product() {
+        $maker_id = $this->authenticate_maker_ajax();
+        $product_id = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
+
+        if ( ! $product_id ) wp_send_json_error( 'Invalid Product.' );
+
+        // Security Check: Ensure this product actually belongs to this Maker
+        $owned_products = get_post_meta( $maker_id, 'maker_product_ids', false );
+        if ( ! in_array( $product_id, $owned_products ) ) {
+            wp_send_json_error( 'Permission Denied.' );
+        }
+
+        // Trash the WooCommerce Product
+        wp_trash_post( $product_id );
+
+        // Remove the specific row from the Maker CPT
+        delete_post_meta( $maker_id, 'maker_product_ids', $product_id );
+
+        wp_send_json_success();
     }
 }
