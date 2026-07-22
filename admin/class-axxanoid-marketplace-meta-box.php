@@ -65,6 +65,24 @@ class Axxanoid_Marketplace_Meta_Box {
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) return;
 		if ( ! current_user_can( 'edit_post', $post_id ) ) return;
 
+		// --- THE ADMIN LAUNCH HOOK ---
+		// Check if we are officially launching a maker into their Trial phase
+		$old_status = get_post_meta( $post_id, 'marketplace_status', true ) ?: 'Trial';
+		$new_status = isset( $_POST['marketplace_status'] ) ? sanitize_text_field( wp_unslash( $_POST['marketplace_status'] ) ) : '';
+
+		if ( $new_status === 'Trial' && $old_status !== 'Trial' ) {
+			// 1. Calculate and stamp exactly +10 Days for their Trial
+			$_POST['trial_expiration_date'] = gmdate( 'Y-m-d', strtotime( '+10 days' ) );
+			
+			// 2. Clear the pitch date flag so Python knows to send the "You're Live" email
+			$_POST['pitch_sent_date'] = '';
+			
+			// 3. Trigger Jetpack to broadcast their new profile to the socials
+			delete_post_meta( $post_id, '_publicize_done' );
+			update_post_meta( $post_id, '_publicize_pending', 1 );
+		}
+		// -----------------------------
+
 		$fields = array(
 			'marketplace_status'    => 'sanitize_text_field',
 			'trial_expiration_date' => 'sanitize_text_field',

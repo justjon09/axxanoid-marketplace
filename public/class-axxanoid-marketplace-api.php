@@ -36,6 +36,13 @@ class Axxanoid_Marketplace_API {
 			'callback'            => array( $this, 'get_expiring_trials' ),
 			'permission_callback' => function() { return current_user_can( 'edit_posts' ); }
 		) );
+
+		// Inbound Applications: Pending Onboarding Link
+		register_rest_route( 'axx_market/v1', '/pending-onboards', array(
+			'methods'             => 'GET',
+			'callback'            => array( $this, 'get_pending_onboards' ),
+			'permission_callback' => function() { return current_user_can( 'edit_posts' ); }
+		) );
 	}
 
 	/**
@@ -123,5 +130,40 @@ class Axxanoid_Marketplace_API {
 			);
 		}
 		return $response;
+	}
+
+	/**
+	 * Returns Inbound Makers who need their magic token link emailed to them.
+	 */
+	public function get_pending_onboards( $request ) {
+		$args = array(
+			'post_type'      => 'axx_market_maker',
+			'post_status'    => 'publish',
+			'posts_per_page' => 50,
+			'meta_query'     => array(
+				'relation' => 'AND',
+				array( 'key' => 'marketplace_status', 'value' => 'Onboarding' ),
+				array(
+					'relation' => 'OR',
+					array( 'key' => 'onboard_sent_date', 'value' => '', 'compare' => '=' ),
+					array( 'key' => 'onboard_sent_date', 'compare' => 'NOT EXISTS' ),
+				),
+			),
+		);
+
+		$query = new WP_Query( $args );
+		
+		// We format this response slightly differently because Python needs the secure token
+		$response = array();
+		foreach ( $query->posts as $post ) {
+			$response[] = array(
+				'id'    => $post->ID,
+				'name'  => html_entity_decode( get_the_title( $post->ID ) ),
+				'email' => get_post_meta( $post->ID, 'maker_email', true ),
+				'token' => get_post_meta( $post->ID, 'marketplace_claim_token', true ),
+			);
+		}
+
+		return new WP_REST_Response( $response, 200 );
 	}
 }
