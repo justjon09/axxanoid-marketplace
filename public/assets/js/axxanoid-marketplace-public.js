@@ -94,10 +94,10 @@
 				}
 
 				row.innerHTML = `
-					<select name="socials[${index}][platform]" class="axx-input-full" style="width: auto;">
+					<select name="socials[${index}][platform]" class="axx-input-full axx-social-select-auto">
 						${optionsHtml}
 					</select>
-					<input type="text" name="socials[${index}][handle]" placeholder="Handle or URL" class="axx-input-full" style="flex:1;" />
+					<input type="text" name="socials[${index}][handle]" placeholder="Handle or URL" class="axx-input-full axx-flex-1" />
 					<a href="#" class="axx-repeater-remove">&times;</a>
 				`;
 				onboardSocialWrapper.appendChild(row);
@@ -120,7 +120,7 @@
 				const row = document.createElement('div');
 				row.className = 'axx-repeater-row';
 				row.innerHTML = `
-					<input type="text" name="awards[${index}][title]" placeholder="Award Title" class="axx-input-full" style="flex:1;" />
+					<input type="text" name="awards[${index}][title]" placeholder="Award Title" class="axx-input-full axx-flex-1" />
 					<input type="text" name="awards[${index}][place]" placeholder="Place (e.g. 1st)" class="axx-input-small" />
 					<a href="#" class="axx-repeater-remove">&times;</a>
 				`;

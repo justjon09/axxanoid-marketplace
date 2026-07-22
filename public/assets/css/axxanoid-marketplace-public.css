@@ -239,3 +239,47 @@
 .axx-onboard-submit-wrap { text-align: center; margin-top: 50px; }
 .axx-onboard-submit-wrap hr { border: 0; height: 1px; background: #e5e7eb; margin-bottom: 30px; }
 .axx-btn-large { font-size: 1.5em; padding: 15px 40px; background: #10b981; border-color: #059669; }
+
+/* Cleaned up Public Profile Styles */
+.axx-maker-socials { display: flex; align-items: center; gap: 15px; }
+.axx-social-icon { display: inline-block; width: 24px; height: 24px; color: #4b5563; }
+.axx-clear { clear: both; }
+.axx-award-icon img { width: 100%; height: 100%; object-fit: contain; }
+
+.axx-maker-callout {
+    font-size: 1.5em;
+    font-style: italic;
+    color: #111827;
+    border-left: 4px solid #10b981;
+    background: #f3f4f6;
+    padding: 20px;
+    border-radius: 0 8px 8px 0;
+    /* Added from inline styles: */
+    float: right;
+    width: 40%;
+    min-width: 250px;
+    margin: 0 0 20px 20px;
+}
+
+/* Cleaned up Onboarding Portal Styles */
+.axx-social-select-auto { width: auto; }
+.axx-product-separator { border: 0; height: 1px; background: #e5e7eb; margin: 30px 0; }
+.axx-saved-products-title { margin-bottom: 15px; }
+.axx-onboard-product-item { position: relative; }
+.axx-empty-products-msg { color: #6b7280; }
+
+.axx-remove-product-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: #d63638;
+    color: #fff;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    text-align: center;
+    line-height: 24px;
+    z-index: 10;
+    text-decoration: none;
+    font-weight: bold;
+}

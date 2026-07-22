@@ -38,7 +38,7 @@
             <div id="axx-onboard-socials-wrapper">
                 <?php foreach ( $socials as $index => $social ) : ?>
                     <div class="axx-repeater-row">
-                        <select name="socials[<?php echo $index; ?>][platform]" class="axx-input-full" style="width: auto;">
+                        <select name="socials[<?php echo $index; ?>][platform]" class="axx-input-full axx-social-select-auto">
                             <option value="">Select Platform...</option>
                             <?php foreach ( $networks as $key => $data ) : ?>
                                 <option value="<?php echo esc_attr($key); ?>" <?php selected( $social['platform'] ?? '', $key ); ?>><?php echo esc_html( $data['label'] ); ?></option>

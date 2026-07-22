@@ -95,7 +95,7 @@ $socials = $socials_json ? json_decode( $socials_json, true ) : array();
         <div class="axx-maker-info-bar">
             <h1 class="axx-maker-title" style="margin: 0; font-size: 2em;"><?php the_title(); ?></h1>
             
-            <div class="axx-maker-socials" style="display:flex; align-items:center; gap:15px;">
+            <div class="axx-maker-socials">
                 <?php 
                 // Load the raw SVGs and the network definitions
                 require_once AXX_MARKET_PLUGIN_DIR . 'public/assets/images/social-svgs.php';
@@ -115,7 +115,7 @@ $socials = $socials_json ? json_decode( $socials_json, true ) : array();
                             $icon_var = $def['icon'];
                             $svg = isset($$icon_var) ? $$icon_var : '';
 
-                            echo '<a href="' . esc_url( $url ) . '" target="_blank" rel="nofollow" title="' . esc_attr( $def['label'] ) . '" style="display:inline-block; width:24px; height:24px; color:#4b5563;">' . $svg . '</a>';
+                            echo '<a href="' . esc_url( $url ) . '" target="_blank" rel="nofollow" title="' . esc_attr( $def['label'] ) . '" class="axx-social-icon">' . $svg . '</a>';
                         }
                     }
                 }
@@ -134,7 +134,7 @@ $socials = $socials_json ? json_decode( $socials_json, true ) : array();
             <?php 
             $bio = get_post_meta( $maker_id, 'maker_bio', true );
             if ( $callout ) : ?>
-                <blockquote class="axx-maker-callout" style="float: right; width: 40%; min-width: 250px; margin: 0 0 20px 20px;">
+                <blockquote class="axx-maker-callout">
                     "<?php echo esc_html( $callout ); ?>"
                 </blockquote>
             <?php endif; ?>
@@ -142,7 +142,7 @@ $socials = $socials_json ? json_decode( $socials_json, true ) : array();
             <div class="axx-maker-bio-text">
                 <?php echo wp_kses_post( wpautop( $bio ) ); ?>
             </div>
-            <div style="clear:both;"></div>
+            <div class="axx-clear"></div>
         </div>
 
         <div class="axx-maker-sidebar">
@@ -153,9 +153,9 @@ $socials = $socials_json ? json_decode( $socials_json, true ) : array();
                         <div class="axx-award-card">
                             <div class="axx-award-icon">
                                 <?php if ( ! empty( $award['image'] ) ) : ?>
-                                    <img src="<?php echo esc_url( $award['image'] ); ?>" style="width:100%; height:100%; object-fit:contain;" />
+                                    <img src="<?php echo esc_url( $award['image'] ); ?>" />
                                 <?php else : ?>
-                                    <img src="<?php echo esc_url( AXX_MARKET_PLUGIN_URL . 'public/assets/images/default-award.svg' ); ?>" style="width:100%; height:100%;" />
+                                    <img src="<?php echo esc_url( AXX_MARKET_PLUGIN_URL . 'public/assets/images/default-award.svg' ); ?>" />
                                 <?php endif; ?>
                             </div>
                             <div class="axx-award-details">
