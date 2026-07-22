@@ -211,3 +211,31 @@
     .axx-maker-info-bar { flex-direction: column; align-items: flex-start; padding: 70px 20px 20px 20px; }
     .axx-maker-portrait-wrap { left: 50%; transform: translateX(-50%); }
 }
+
+/* Maker Onboarding Portal */
+.axx-market-onboard-container { max-width: 900px; margin: 40px auto; }
+
+.axx-onboard-pending-banner { text-align: center; padding: 40px; border-radius: 8px; background: #ecfdf5; border: 1px solid #10b981; }
+.axx-onboard-pending-banner h2 { color: #065f46; margin-bottom: 10px; }
+.axx-onboard-pending-banner p { color: #047857; font-size: 1.1em; }
+
+.axx-onboard-header { text-align: center; margin-bottom: 40px; }
+.axx-onboard-header p { font-size: 1.2em; color: #4b5563; }
+
+.axx-onboard-section { background: #fff; padding: 30px; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 40px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+.axx-onboard-section-title { margin-top: 0; border-bottom: 2px solid #f3f4f6; padding-bottom: 10px; }
+
+.axx-form-hint { font-size: 0.9em; color: #6b7280; margin-top: 0; }
+.axx-input-full { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+.axx-input-small { width: 120px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+
+.axx-repeater-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+.axx-repeater-remove { color: #d63638; font-weight: bold; text-decoration: none; }
+
+.axx-flex-row { display: flex; gap: 15px; margin-bottom: 15px; }
+.axx-flex-2 { flex: 2; }
+.axx-flex-1 { flex: 1; }
+
+.axx-onboard-submit-wrap { text-align: center; margin-top: 50px; }
+.axx-onboard-submit-wrap hr { border: 0; height: 1px; background: #e5e7eb; margin-bottom: 30px; }
+.axx-btn-large { font-size: 1.5em; padding: 15px 40px; background: #10b981; border-color: #059669; }
